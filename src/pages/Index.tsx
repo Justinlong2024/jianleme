@@ -17,12 +17,14 @@ import ProfilePage from '@/pages/ProfilePage';
 import MediaPage from '@/pages/MediaPage';
 import AuthPage from '@/pages/AuthPage';
 import { useAuth } from '@/hooks/useAuth';
+import { useSubscription } from '@/hooks/useSubscription';
 import { HealthRecord } from '@/types';
 
 const initialWeightData = generateMockWeightData();
 
 const Index = () => {
   const { user, loading: authLoading, isAdmin, signOut } = useAuth();
+  const { isPremium, loading: subLoading } = useSubscription(user?.id);
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [checkIn, setCheckIn] = useState(getTodayCheckIn());
   const [weightData, setWeightData] = useState<HealthRecord[]>(initialWeightData);
@@ -133,7 +135,7 @@ const Index = () => {
     return days;
   }, []);
 
-  if (authLoading) {
+  if (authLoading || subLoading) {
     return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">加载中...</div>;
   }
 
@@ -236,8 +238,8 @@ const Index = () => {
 
             {/* Health Data Section */}
             <div className="mt-5">
-              <HealthInputForm onSave={handleAddHealthRecord} />
-              {(() => {
+              <HealthInputForm onSave={handleAddHealthRecord} isPremium={isPremium} />
+              {isPremium && (() => {
                 const latest = weightData[weightData.length - 1];
                 const first = weightData[0];
                 const weightChange = latest?.weight && first?.weight ? (latest.weight - first.weight).toFixed(1) : null;
@@ -270,13 +272,14 @@ const Index = () => {
               })()}
             </div>
 
-            {/* Weight Chart */}
-            <div className="mt-4">
-              <WeightChart data={weightData} />
-            </div>
+            {isPremium && (
+              <div className="mt-4">
+                <WeightChart data={weightData} />
+              </div>
+            )}
 
             {/* Monthly Summary */}
-            {(() => {
+            {isPremium && (() => {
               const latest = weightData[weightData.length - 1];
               const first = weightData[0];
               const weightChange = latest?.weight && first?.weight ? (latest.weight - first.weight).toFixed(1) : null;
@@ -313,7 +316,7 @@ const Index = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <CoursePage />
+            <CoursePage isPremium={isPremium} />
           </motion.div>
         )}
 
@@ -337,6 +340,7 @@ const Index = () => {
             exit={{ opacity: 0 }}
           >
             <ProfilePage
+              isPremium={isPremium}
               lifeTree={{
                 level: levelInfo.level,
                 levelLabel: levelInfo.label,
