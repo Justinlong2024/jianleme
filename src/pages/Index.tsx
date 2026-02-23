@@ -12,7 +12,7 @@ import WeightChart from '@/components/WeightChart';
 import HealthInputForm from '@/components/HealthInputForm';
 import { Activity, TrendingUp, Droplet, Heart } from 'lucide-react';
 import CheckInPage from '@/pages/CheckInPage';
-import DataPage from '@/pages/DataPage';
+
 import ProfilePage from '@/pages/ProfilePage';
 import MediaPage from '@/pages/MediaPage';
 
@@ -206,9 +206,38 @@ const Index = () => {
             </div>
 
             {/* Weight Chart */}
-            <div className="mt-4 mb-6">
+            <div className="mt-4">
               <WeightChart data={weightData} />
             </div>
+
+            {/* Monthly Summary */}
+            {(() => {
+              const latest = weightData[weightData.length - 1];
+              const first = weightData[0];
+              const weightChange = latest?.weight && first?.weight ? (latest.weight - first.weight).toFixed(1) : null;
+              const fatChange = latest?.bodyFat && first?.bodyFat ? (latest.bodyFat - first.bodyFat).toFixed(1) : null;
+              return (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="wabi-card mt-4 mb-6"
+                >
+                  <h3 className="font-semibold text-foreground mb-3">本月小结</h3>
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    {weightChange && parseFloat(weightChange) < 0 ? (
+                      <p>✦ 您的体重在记录期间下降了 <span className="text-primary font-semibold">{Math.abs(parseFloat(weightChange))}kg</span>，非常棒！</p>
+                    ) : (
+                      <p>✦ 坚持记录，看见自己的改变</p>
+                    )}
+                    {fatChange && parseFloat(fatChange) < 0 && (
+                      <p>✦ 体脂率下降了 {Math.abs(parseFloat(fatChange))}%，说明减掉的主要是脂肪</p>
+                    )}
+                    <p>✦ 建议继续保持记录习惯，数据会帮你做更好的决策</p>
+                  </div>
+                </motion.div>
+              );
+            })()}
           </motion.div>
         )}
 
@@ -234,16 +263,6 @@ const Index = () => {
           </motion.div>
         )}
 
-        {activeTab === 'data' && (
-          <motion.div
-            key="data"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <DataPage weightData={weightData} onAddHealthRecord={handleAddHealthRecord} />
-          </motion.div>
-        )}
 
         {activeTab === 'profile' && (
           <motion.div

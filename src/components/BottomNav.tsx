@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TabType } from '@/types';
-import { Home, ClipboardCheck, ImageIcon, BarChart3, User } from 'lucide-react';
+import { Home, ClipboardCheck, ImageIcon, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface BottomNavProps {
@@ -12,7 +12,6 @@ const tabs: { key: TabType; label: string; icon: typeof Home }[] = [
   { key: 'home', label: '首页', icon: Home },
   { key: 'checkin', label: '打卡', icon: ClipboardCheck },
   { key: 'media', label: '记录', icon: ImageIcon },
-  { key: 'data', label: '数据', icon: BarChart3 },
   { key: 'profile', label: '我的', icon: User },
 ];
 
