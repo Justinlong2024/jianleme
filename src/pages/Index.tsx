@@ -9,6 +9,8 @@ import MealCard from '@/components/MealCard';
 import WaterTracker from '@/components/WaterTracker';
 import MeditationCard from '@/components/MeditationCard';
 import WeightChart from '@/components/WeightChart';
+import HealthInputForm from '@/components/HealthInputForm';
+import { Activity, TrendingUp, Droplet, Heart } from 'lucide-react';
 import CheckInPage from '@/pages/CheckInPage';
 import DataPage from '@/pages/DataPage';
 import ProfilePage from '@/pages/ProfilePage';
@@ -165,6 +167,42 @@ const Index = () => {
                 records={checkIn.meditationRecords}
                 totalMinutes={meditationMinutes}
               />
+            </div>
+
+            {/* Health Data Section */}
+            <div className="mt-5">
+              <HealthInputForm onSave={handleAddHealthRecord} />
+              {(() => {
+                const latest = weightData[weightData.length - 1];
+                const first = weightData[0];
+                const weightChange = latest?.weight && first?.weight ? (latest.weight - first.weight).toFixed(1) : null;
+                const fatChange = latest?.bodyFat && first?.bodyFat ? (latest.bodyFat - first.bodyFat).toFixed(1) : null;
+                const bp = latest?.bloodPressureSystolic && latest?.bloodPressureDiastolic
+                  ? `${latest.bloodPressureSystolic}/${latest.bloodPressureDiastolic}` : '--/--';
+                const metrics = [
+                  { label: '体重', value: latest?.weight ? `${latest.weight} kg` : '--', icon: Activity, change: weightChange ? `${parseFloat(weightChange) <= 0 ? '' : '+'}${weightChange}kg` : '暂无', positive: weightChange ? parseFloat(weightChange) <= 0 : true },
+                  { label: '体脂率', value: latest?.bodyFat ? `${latest.bodyFat}%` : '--', icon: TrendingUp, change: fatChange ? `${parseFloat(fatChange) <= 0 ? '' : '+'}${fatChange}%` : '暂无', positive: fatChange ? parseFloat(fatChange) <= 0 : true },
+                  { label: '空腹血糖', value: latest?.bloodSugar ? `${latest.bloodSugar} mmol/L` : '--', icon: Droplet, change: latest?.bloodSugar ? (latest.bloodSugar <= 6.1 ? '正常' : '偏高') : '暂无', positive: latest?.bloodSugar ? latest.bloodSugar <= 6.1 : true },
+                  { label: '血压', value: bp, icon: Heart, change: latest?.bloodPressureSystolic ? (latest.bloodPressureSystolic <= 140 ? '正常' : '偏高') : '暂无', positive: latest?.bloodPressureSystolic ? latest.bloodPressureSystolic <= 140 : true },
+                ];
+                return (
+                  <div className="grid grid-cols-2 gap-3 mt-3">
+                    {metrics.map((m) => {
+                      const Icon = m.icon;
+                      return (
+                        <div key={m.label} className="wabi-card">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Icon size={16} className="text-primary" />
+                            <span className="text-xs text-muted-foreground">{m.label}</span>
+                          </div>
+                          <div className="text-lg font-bold text-foreground">{m.value}</div>
+                          <div className={`text-xs mt-1 ${m.positive ? 'text-success' : 'text-destructive'}`}>{m.change}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Weight Chart */}
