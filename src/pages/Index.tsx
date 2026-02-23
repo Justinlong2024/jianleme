@@ -12,7 +12,7 @@ import MeditationCard from '@/components/MeditationCard';
 import WeightChart from '@/components/WeightChart';
 import HealthInputForm from '@/components/HealthInputForm';
 import { Activity, TrendingUp, Droplet, Heart } from 'lucide-react';
-import CheckInPage from '@/pages/CheckInPage';
+import CoursePage from '@/pages/CoursePage';
 
 import ProfilePage from '@/pages/ProfilePage';
 import MediaPage from '@/pages/MediaPage';
@@ -297,14 +297,14 @@ const Index = () => {
           </motion.div>
         )}
 
-        {activeTab === 'checkin' && (
+        {activeTab === 'course' && (
           <motion.div
-            key="checkin"
+            key="course"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <CheckInPage checkIn={checkIn} onToggleFasting={handleToggleFasting} onAddWater={handleAddWater} onAddFoodToMeal={handleAddFoodToMeal} />
+            <CoursePage />
           </motion.div>
         )}
 
