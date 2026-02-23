@@ -1,15 +1,31 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { User, Settings, Bell, Shield, HelpCircle, LogOut, ChevronRight, Crown } from 'lucide-react';
+import SubscriptionPage from '@/components/profile/SubscriptionPage';
+import NotificationSettingsPage from '@/components/profile/NotificationSettingsPage';
+import PrivacySettingsPage from '@/components/profile/PrivacySettingsPage';
+import HelpFeedbackPage from '@/components/profile/HelpFeedbackPage';
+import AppSettingsPage from '@/components/profile/AppSettingsPage';
 
-const menuItems = [
-  { icon: Crown, label: '订阅管理', subtitle: '高级会员' },
-  { icon: Bell, label: '提醒设置', subtitle: '已开启' },
-  { icon: Shield, label: '隐私设置', subtitle: '' },
-  { icon: HelpCircle, label: '帮助与反馈', subtitle: '' },
-  { icon: Settings, label: '应用设置', subtitle: '' },
+type SubPage = 'main' | 'subscription' | 'notifications' | 'privacy' | 'help' | 'settings';
+
+const menuItems: { icon: typeof Crown; label: string; subtitle: string; page: SubPage }[] = [
+  { icon: Crown, label: '订阅管理', subtitle: '高级会员', page: 'subscription' },
+  { icon: Bell, label: '提醒设置', subtitle: '已开启', page: 'notifications' },
+  { icon: Shield, label: '隐私设置', subtitle: '', page: 'privacy' },
+  { icon: HelpCircle, label: '帮助与反馈', subtitle: '', page: 'help' },
+  { icon: Settings, label: '应用设置', subtitle: '', page: 'settings' },
 ];
 
 const ProfilePage = () => {
+  const [subPage, setSubPage] = useState<SubPage>('main');
+
+  if (subPage === 'subscription') return <SubscriptionPage onBack={() => setSubPage('main')} />;
+  if (subPage === 'notifications') return <NotificationSettingsPage onBack={() => setSubPage('main')} />;
+  if (subPage === 'privacy') return <PrivacySettingsPage onBack={() => setSubPage('main')} />;
+  if (subPage === 'help') return <HelpFeedbackPage onBack={() => setSubPage('main')} />;
+  if (subPage === 'settings') return <AppSettingsPage onBack={() => setSubPage('main')} />;
+
   return (
     <div className="max-w-lg mx-auto px-4 pt-6 pb-20">
       {/* Avatar & Info */}
@@ -63,6 +79,7 @@ const ProfilePage = () => {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 + i * 0.03 }}
+              onClick={() => setSubPage(item.page)}
               className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-muted/50 transition-colors border-b border-border last:border-b-0"
             >
               <Icon size={18} className="text-muted-foreground" />
@@ -88,7 +105,7 @@ const ProfilePage = () => {
       </motion.button>
 
       <p className="text-center text-[10px] text-muted-foreground mt-6">
-        辟了么 v1.0.0 · 用简约守护健康
+        简了么 v1.0.0 · 简法守护健康
       </p>
     </div>
   );
