@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Play, Headphones, FileText, Eye, Lock, BookOpen, X, Download } from 'lucide-react';
+import { Search, Play, Headphones, FileText, Eye, Lock, BookOpen, X, Download, ArrowLeft, ChevronRight } from 'lucide-react';
 import { COURSE_CATEGORIES } from '@/data/mockCourses';
 import type { CourseCategory } from '@/data/mockCourses';
 import { useCourses, type CourseDB } from '@/hooks/useCourses';
@@ -96,30 +96,60 @@ const CoursePlayer = ({ course }: { course: CourseDB }) => {
 };
 
 const CoursePage = ({ isPremium = false }: { isPremium?: boolean }) => {
-  const [activeCategory, setActiveCategory] = useState<CourseCategory | 'all'>('all');
+  const [activeCategory, setActiveCategory] = useState<CourseCategory | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<CourseDB | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: courses = [], isLoading } = useCourses(
     searchQuery || undefined,
-    activeCategory !== 'all' ? activeCategory : undefined
+    activeCategory || undefined
   );
+
+  // Group courses by category for showing counts
+  const allCourses = useCourses(undefined, undefined);
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    (allCourses.data || []).forEach((c) => {
+      counts[c.category] = (counts[c.category] || 0) + 1;
+    });
+    return counts;
+  }, [allCourses.data]);
 
   const handleStartLearning = () => {
     setIsPlaying(true);
   };
 
+  const isSearching = searchQuery.trim().length > 0;
+
   return (
     <div className="max-w-lg mx-auto px-4 pt-6 pb-20">
-      <div className="flex items-center gap-2 mb-1">
-        <BookOpen size={22} className="text-primary" />
-        <h1 className="text-xl font-bold text-foreground font-serif">课堂</h1>
-      </div>
-      <p className="text-sm text-muted-foreground mb-4">探索身心合一的智慧</p>
+      {/* Header */}
+      {activeCategory && !isSearching ? (
+        <div className="flex items-center gap-2 mb-1">
+          <button
+            onClick={() => setActiveCategory(null)}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft size={16} />
+          </button>
+          <span className="text-lg">
+            {COURSE_CATEGORIES.find((c) => c.key === activeCategory)?.icon}
+          </span>
+          <h1 className="text-xl font-bold text-foreground font-serif">{activeCategory}</h1>
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center gap-2 mb-1">
+            <BookOpen size={22} className="text-primary" />
+            <h1 className="text-xl font-bold text-foreground font-serif">课堂</h1>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">探索身心合一的智慧</p>
+        </>
+      )}
 
       {/* Search bar */}
-      <div className="relative mb-4">
+      <div className="relative mb-4 mt-3">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="搜索课程或讲师..."
@@ -129,95 +159,97 @@ const CoursePage = ({ isPremium = false }: { isPremium?: boolean }) => {
         />
       </div>
 
-      {/* Category chips */}
-      <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide">
-        <button
-          onClick={() => setActiveCategory('all')}
-          className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-            activeCategory === 'all'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted text-muted-foreground'
-          }`}
-        >
-          全部
-        </button>
-        {COURSE_CATEGORIES.map((cat) => (
-          <button
-            key={cat.key}
-            onClick={() => setActiveCategory(cat.key)}
-            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-              activeCategory === cat.key
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground'
-            }`}
-          >
-            {cat.icon} {cat.key}
-          </button>
-        ))}
-      </div>
-
-      {/* Course list */}
-      {isLoading ? (
-        <div className="text-center py-10 text-muted-foreground text-sm">加载中...</div>
-      ) : courses.length === 0 ? (
-        <div className="text-center py-10 text-muted-foreground text-sm">暂无课程</div>
-      ) : (
-        <div className="space-y-3">
-          {courses.map((course, i) => {
-            const Icon = typeIcon[course.type] || Play;
-            return (
-              <motion.div
-                key={course.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04 }}
-                onClick={() => { setSelectedCourse(course); setIsPlaying(false); }}
-                className="wabi-card flex gap-3.5 !p-4 cursor-pointer active:scale-[0.98] transition-transform"
-              >
-                {/* Thumbnail */}
-                <div className="w-20 h-20 shrink-0 rounded-xl bg-muted overflow-hidden relative">
-                  <img
-                    src={getCourseThumbnail(course.category, course.thumbnail)}
-                    alt={course.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-foreground/5 flex items-center justify-center">
-                    <Icon size={18} className="text-card/80 drop-shadow" />
-                  </div>
-                  {!course.is_free && (
-                    <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-secondary/90 flex items-center justify-center">
-                      <Lock size={10} className="text-secondary-foreground" />
-                    </div>
-                  )}
+      {/* Category grid (show when no category selected and not searching) */}
+      {!activeCategory && !isSearching && (
+        <div className="grid grid-cols-2 gap-3">
+          {COURSE_CATEGORIES.map((cat, i) => (
+            <motion.button
+              key={cat.key}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.03 }}
+              onClick={() => setActiveCategory(cat.key)}
+              className="wabi-card !p-4 flex items-center gap-3 text-left active:scale-[0.97] transition-transform"
+            >
+              <span className="text-2xl">{cat.icon}</span>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold text-foreground">{cat.key}</div>
+                <div className="text-[10px] text-muted-foreground">
+                  {categoryCounts[cat.key] || 0} 门课程
                 </div>
-
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-foreground leading-snug line-clamp-2">
-                    {course.title}
-                  </h3>
-                  <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
-                    {course.instructor}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                      {typeLabel[course.type] || course.type}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">{course.duration}</span>
-                    <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                      <Eye size={10} /> {formatViews(course.views)}
-                    </span>
-                    {course.is_free && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">
-                        免费
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+              </div>
+              <ChevronRight size={16} className="text-muted-foreground shrink-0" />
+            </motion.button>
+          ))}
         </div>
+      )}
+
+      {/* Course list (show when category selected or searching) */}
+      {(activeCategory || isSearching) && (
+        <>
+          {isLoading ? (
+            <div className="text-center py-10 text-muted-foreground text-sm">加载中...</div>
+          ) : courses.length === 0 ? (
+            <div className="text-center py-10 text-muted-foreground text-sm">暂无课程</div>
+          ) : (
+            <div className="space-y-3">
+              {courses.map((course, i) => {
+                const Icon = typeIcon[course.type] || Play;
+                return (
+                  <motion.div
+                    key={course.id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                    onClick={() => { setSelectedCourse(course); setIsPlaying(false); }}
+                    className="wabi-card flex gap-3.5 !p-4 cursor-pointer active:scale-[0.98] transition-transform"
+                  >
+                    {/* Thumbnail */}
+                    <div className="w-20 h-20 shrink-0 rounded-xl bg-muted overflow-hidden relative">
+                      <img
+                        src={getCourseThumbnail(course.category, course.thumbnail)}
+                        alt={course.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-foreground/5 flex items-center justify-center">
+                        <Icon size={18} className="text-card/80 drop-shadow" />
+                      </div>
+                      {!course.is_free && (
+                        <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-secondary/90 flex items-center justify-center">
+                          <Lock size={10} className="text-secondary-foreground" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-semibold text-foreground leading-snug line-clamp-2">
+                        {course.title}
+                      </h3>
+                      <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                        {course.instructor}
+                      </p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                          {typeLabel[course.type] || course.type}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">{course.duration}</span>
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                          <Eye size={10} /> {formatViews(course.views)}
+                        </span>
+                        {course.is_free && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">
+                            免费
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
 
       {/* Course detail modal */}
