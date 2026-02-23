@@ -97,6 +97,17 @@ const Index = () => {
       totalCalories: prev.totalCalories + addedCalories,
     }));
   }, []);
+
+  const handleAddMeditationRecord = useCallback((record: Omit<import('@/types').MeditationRecord, 'id'>) => {
+    setCheckIn((prev) => ({
+      ...prev,
+      meditationRecords: [
+        ...prev.meditationRecords,
+        { ...record, id: `m-${Date.now()}` },
+      ],
+    }));
+  }, []);
+
   const meditationMinutes = checkIn.meditationRecords.reduce((s, r) => s + r.duration, 0);
 
   const getGreeting = () => {
@@ -180,6 +191,7 @@ const Index = () => {
               <MeditationCard
                 records={checkIn.meditationRecords}
                 totalMinutes={meditationMinutes}
+                onAddRecord={handleAddMeditationRecord}
               />
             </div>
 
