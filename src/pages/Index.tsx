@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TabType } from '@/types';
 import { getTodayCheckIn, generateMockWeightData } from '@/data/mockData';
 import BottomNav from '@/components/BottomNav';
 import DailySummary from '@/components/DailySummary';
 import LifeTree from '@/components/LifeTree';
+import { calculateDailyPoints, getLevelInfo } from '@/lib/lifeTreeSystem';
 import MealCard from '@/components/MealCard';
 import WaterTracker from '@/components/WaterTracker';
 import MeditationCard from '@/components/MeditationCard';
@@ -110,6 +111,12 @@ const Index = () => {
 
   const meditationMinutes = checkIn.meditationRecords.reduce((s, r) => s + r.duration, 0);
 
+  // Life Tree points calculation
+  const dailyPointsData = useMemo(() => calculateDailyPoints(checkIn), [checkIn]);
+  const BASE_POINTS = 150; // Simulated historical points (TODO: from DB)
+  const totalPoints = BASE_POINTS + dailyPointsData.total;
+  const levelInfo = useMemo(() => getLevelInfo(totalPoints), [totalPoints]);
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 6) return '夜深了 🌙';
@@ -152,7 +159,15 @@ const Index = () => {
                    dangerouslySetInnerHTML={{ __html: getFastingStatus() }}
                 />
               </div>
-              <LifeTree level={3} points={1250} nextLevelPoints={2000} />
+              <LifeTree
+                level={levelInfo.level}
+                levelLabel={levelInfo.label}
+                points={levelInfo.pointsInLevel}
+                nextLevelPoints={levelInfo.pointsNeeded}
+                todayPoints={dailyPointsData.total}
+                breakdown={dailyPointsData.breakdown}
+                isMaxLevel={levelInfo.isMaxLevel}
+              />
             </div>
 
             {/* Daily Summary */}
