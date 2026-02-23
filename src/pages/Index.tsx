@@ -14,11 +14,29 @@ import DataPage from '@/pages/DataPage';
 import ProfilePage from '@/pages/ProfilePage';
 import MediaPage from '@/pages/MediaPage';
 
-const weightData = generateMockWeightData();
+import { HealthRecord } from '@/types';
+
+const initialWeightData = generateMockWeightData();
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [checkIn, setCheckIn] = useState(getTodayCheckIn());
+  const [weightData, setWeightData] = useState<HealthRecord[]>(initialWeightData);
+
+  const handleAddHealthRecord = useCallback((record: Omit<HealthRecord, 'id'>) => {
+    const newRecord: HealthRecord = { ...record, id: `h-${Date.now()}` };
+    setWeightData((prev) => {
+      // Replace today's record if exists, otherwise append
+      const todayDate = new Date().toISOString().split('T')[0];
+      const existing = prev.findIndex((r) => r.date === todayDate);
+      if (existing >= 0) {
+        const updated = [...prev];
+        updated[existing] = { ...updated[existing], ...newRecord };
+        return updated;
+      }
+      return [...prev, newRecord];
+    });
+  }, []);
 
   const handleToggleFasting = useCallback((mealType: string) => {
     setCheckIn((prev) => ({
@@ -185,7 +203,7 @@ const Index = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <DataPage weightData={weightData} />
+            <DataPage weightData={weightData} onAddHealthRecord={handleAddHealthRecord} />
           </motion.div>
         )}
 
