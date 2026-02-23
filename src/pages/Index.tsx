@@ -13,15 +13,16 @@ import WeightChart from '@/components/WeightChart';
 import HealthInputForm from '@/components/HealthInputForm';
 import { Activity, TrendingUp, Droplet, Heart } from 'lucide-react';
 import CoursePage from '@/pages/CoursePage';
-
 import ProfilePage from '@/pages/ProfilePage';
 import MediaPage from '@/pages/MediaPage';
-
+import AuthPage from '@/pages/AuthPage';
+import { useAuth } from '@/hooks/useAuth';
 import { HealthRecord } from '@/types';
 
 const initialWeightData = generateMockWeightData();
 
 const Index = () => {
+  const { user, loading: authLoading, isAdmin, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [checkIn, setCheckIn] = useState(getTodayCheckIn());
   const [weightData, setWeightData] = useState<HealthRecord[]>(initialWeightData);
@@ -131,6 +132,14 @@ const Index = () => {
     }
     return days;
   }, []);
+
+  if (authLoading) {
+    return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">加载中...</div>;
+  }
+
+  if (!user) {
+    return <AuthPage onAuthSuccess={() => {}} />;
+  }
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -327,15 +336,21 @@ const Index = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <ProfilePage lifeTree={{
-              level: levelInfo.level,
-              levelLabel: levelInfo.label,
-              totalPoints,
-              pointsInLevel: levelInfo.pointsInLevel,
-              pointsNeeded: levelInfo.pointsNeeded,
-              isMaxLevel: levelInfo.isMaxLevel,
-              growthHistory,
-            }} />
+            <ProfilePage
+              lifeTree={{
+                level: levelInfo.level,
+                levelLabel: levelInfo.label,
+                totalPoints,
+                pointsInLevel: levelInfo.pointsInLevel,
+                pointsNeeded: levelInfo.pointsNeeded,
+                isMaxLevel: levelInfo.isMaxLevel,
+                growthHistory,
+              }}
+              isAdmin={isAdmin}
+              onSignOut={signOut}
+              userEmail={user.email}
+              displayName={user.user_metadata?.display_name}
+            />
           </motion.div>
         )}
       </AnimatePresence>

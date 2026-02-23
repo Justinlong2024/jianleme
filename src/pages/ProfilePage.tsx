@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, Settings, Bell, Shield, HelpCircle, LogOut, ChevronRight, Crown } from 'lucide-react';
+import { User, Settings, Bell, Shield, HelpCircle, LogOut, ChevronRight, Crown, GraduationCap } from 'lucide-react';
 import SubscriptionPage from '@/components/profile/SubscriptionPage';
 import NotificationSettingsPage from '@/components/profile/NotificationSettingsPage';
 import PrivacySettingsPage from '@/components/profile/PrivacySettingsPage';
 import HelpFeedbackPage from '@/components/profile/HelpFeedbackPage';
 import AppSettingsPage from '@/components/profile/AppSettingsPage';
 import LifeTreeProfileCard from '@/components/profile/LifeTreeProfileCard';
+import AdminCoursePage from '@/pages/AdminCoursePage';
 
 interface LifeTreeData {
   level: number;
@@ -20,9 +21,13 @@ interface LifeTreeData {
 
 interface ProfilePageProps {
   lifeTree?: LifeTreeData;
+  isAdmin?: boolean;
+  onSignOut?: () => void;
+  userEmail?: string;
+  displayName?: string;
 }
 
-type SubPage = 'main' | 'subscription' | 'notifications' | 'privacy' | 'help' | 'settings';
+type SubPage = 'main' | 'subscription' | 'notifications' | 'privacy' | 'help' | 'settings' | 'admin-courses';
 
 const menuItems: { icon: typeof Crown; label: string; subtitle: string; page: SubPage }[] = [
   { icon: Crown, label: '订阅管理', subtitle: '高级会员', page: 'subscription' },
@@ -32,7 +37,7 @@ const menuItems: { icon: typeof Crown; label: string; subtitle: string; page: Su
   { icon: Settings, label: '应用设置', subtitle: '', page: 'settings' },
 ];
 
-const ProfilePage = ({ lifeTree }: ProfilePageProps) => {
+const ProfilePage = ({ lifeTree, isAdmin, onSignOut, userEmail, displayName }: ProfilePageProps) => {
   const [subPage, setSubPage] = useState<SubPage>('main');
 
   if (subPage === 'subscription') return <SubscriptionPage onBack={() => setSubPage('main')} />;
@@ -40,6 +45,7 @@ const ProfilePage = ({ lifeTree }: ProfilePageProps) => {
   if (subPage === 'privacy') return <PrivacySettingsPage onBack={() => setSubPage('main')} />;
   if (subPage === 'help') return <HelpFeedbackPage onBack={() => setSubPage('main')} />;
   if (subPage === 'settings') return <AppSettingsPage onBack={() => setSubPage('main')} />;
+  if (subPage === 'admin-courses') return <AdminCoursePage onBack={() => setSubPage('main')} />;
 
   return (
     <div className="max-w-lg mx-auto px-4 pt-6 pb-20">
@@ -53,8 +59,8 @@ const ProfilePage = ({ lifeTree }: ProfilePageProps) => {
           <User size={28} className="text-primary" />
         </div>
         <div className="flex-1">
-          <h2 className="text-lg font-bold text-foreground">用户</h2>
-          <p className="text-xs text-muted-foreground">辟谷第 7 天 · 连续打卡 7 天</p>
+          <h2 className="text-lg font-bold text-foreground">{displayName || '用户'}</h2>
+          <p className="text-xs text-muted-foreground">{userEmail || '辟谷第 7 天 · 连续打卡 7 天'}</p>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
               高级会员
@@ -97,6 +103,21 @@ const ProfilePage = ({ lifeTree }: ProfilePageProps) => {
         />
       )}
 
+      {/* Admin menu */}
+      {isAdmin && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="wabi-card !p-0 overflow-hidden mb-3">
+          <button
+            onClick={() => setSubPage('admin-courses')}
+            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-muted/50 transition-colors"
+          >
+            <GraduationCap size={18} className="text-primary" />
+            <span className="flex-1 text-sm text-foreground text-left font-medium">课程管理</span>
+            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full">管理员</span>
+            <ChevronRight size={16} className="text-muted-foreground" />
+          </button>
+        </motion.div>
+      )}
+
       {/* Menu */}
       <div className="wabi-card !p-0 overflow-hidden">
         {menuItems.map((item, i) => {
@@ -126,6 +147,7 @@ const ProfilePage = ({ lifeTree }: ProfilePageProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
+        onClick={onSignOut}
         className="w-full mt-5 wabi-card flex items-center justify-center gap-2 text-destructive hover:bg-destructive/5 transition-colors"
       >
         <LogOut size={16} />
