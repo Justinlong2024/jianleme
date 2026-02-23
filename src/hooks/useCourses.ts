@@ -12,6 +12,7 @@ export interface CourseDB {
   description: string | null;
   is_free: boolean;
   views: number;
+  content_url: string | null;
   created_at: string;
   updated_at: string;
 }

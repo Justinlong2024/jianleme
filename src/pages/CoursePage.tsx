@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Play, Headphones, FileText, Eye, Lock, BookOpen } from 'lucide-react';
+import { Search, Play, Headphones, FileText, Eye, Lock, BookOpen, X, Download } from 'lucide-react';
 import { COURSE_CATEGORIES } from '@/data/mockCourses';
 import type { CourseCategory } from '@/data/mockCourses';
 import { useCourses, type CourseDB } from '@/hooks/useCourses';
@@ -25,15 +25,90 @@ const formatViews = (n: number) => {
   return String(n);
 };
 
+const CoursePlayer = ({ course }: { course: CourseDB }) => {
+  const url = course.content_url;
+  if (!url) {
+    return (
+      <div className="w-full h-48 bg-muted rounded-xl flex items-center justify-center text-muted-foreground text-sm">
+        暂无内容
+      </div>
+    );
+  }
+
+  if (course.type === 'video') {
+    return (
+      <video
+        src={url}
+        controls
+        controlsList="nodownload"
+        className="w-full rounded-xl bg-black"
+        style={{ maxHeight: 280 }}
+      >
+        您的浏览器不支持视频播放
+      </video>
+    );
+  }
+
+  if (course.type === 'audio') {
+    return (
+      <div className="w-full bg-muted/50 rounded-xl p-4 flex flex-col items-center gap-3">
+        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+          <Headphones size={28} className="text-primary" />
+        </div>
+        <audio src={url} controls className="w-full">
+          您的浏览器不支持音频播放
+        </audio>
+      </div>
+    );
+  }
+
+  if (course.type === 'article') {
+    const isPdf = url.toLowerCase().endsWith('.pdf');
+    if (isPdf) {
+      return (
+        <iframe
+          src={url}
+          className="w-full rounded-xl border border-border"
+          style={{ height: 350 }}
+          title={course.title}
+        />
+      );
+    }
+    return (
+      <div className="w-full bg-muted/50 rounded-xl p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <FileText size={20} className="text-primary" />
+          <span className="text-sm font-medium text-foreground">文档</span>
+        </div>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+        >
+          <Download size={14} /> 查看/下载文档
+        </a>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 const CoursePage = () => {
   const [activeCategory, setActiveCategory] = useState<CourseCategory | 'all'>('all');
   const [selectedCourse, setSelectedCourse] = useState<CourseDB | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: courses = [], isLoading } = useCourses(
     searchQuery || undefined,
     activeCategory !== 'all' ? activeCategory : undefined
   );
+
+  const handleStartLearning = () => {
+    setIsPlaying(true);
+  };
 
   return (
     <div className="max-w-lg mx-auto px-4 pt-6 pb-20">
@@ -96,7 +171,7 @@ const CoursePage = () => {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                onClick={() => setSelectedCourse(course)}
+                onClick={() => { setSelectedCourse(course); setIsPlaying(false); }}
                 className="wabi-card flex gap-3.5 !p-4 cursor-pointer active:scale-[0.98] transition-transform"
               >
                 {/* Thumbnail */}
@@ -160,17 +235,32 @@ const CoursePage = () => {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="w-full max-w-lg bg-card rounded-t-3xl overflow-hidden"
+              className="w-full max-w-lg bg-card rounded-t-3xl overflow-hidden max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Cover image */}
-              <div className="w-full h-40 bg-muted">
-                <img
-                  src={getCourseThumbnail(selectedCourse.category, selectedCourse.thumbnail)}
-                  alt={selectedCourse.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              {/* Close button */}
+              <button
+                onClick={() => setSelectedCourse(null)}
+                className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-card/80 backdrop-blur flex items-center justify-center"
+              >
+                <X size={16} className="text-foreground" />
+              </button>
+
+              {/* Player or cover image */}
+              {isPlaying ? (
+                <div className="p-4 pt-6">
+                  <CoursePlayer course={selectedCourse} />
+                </div>
+              ) : (
+                <div className="w-full h-40 bg-muted">
+                  <img
+                    src={getCourseThumbnail(selectedCourse.category, selectedCourse.thumbnail)}
+                    alt={selectedCourse.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+
               <div className="p-6 pb-10">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">
@@ -194,16 +284,19 @@ const CoursePage = () => {
                   <Eye size={12} /> {formatViews(selectedCourse.views)} 次学习
                 </div>
 
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  className={`w-full py-3.5 rounded-2xl font-semibold text-sm ${
-                    selectedCourse.is_free
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-secondary-foreground'
-                  }`}
-                >
-                  {selectedCourse.is_free ? '开始学习' : '解锁课程'}
-                </motion.button>
+                {!isPlaying && (
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    onClick={selectedCourse.is_free ? handleStartLearning : undefined}
+                    className={`w-full py-3.5 rounded-2xl font-semibold text-sm ${
+                      selectedCourse.is_free
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-secondary text-secondary-foreground'
+                    }`}
+                  >
+                    {selectedCourse.is_free ? '开始学习' : '解锁课程'}
+                  </motion.button>
+                )}
               </div>
             </motion.div>
           </motion.div>
