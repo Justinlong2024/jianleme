@@ -43,6 +43,32 @@ export interface HealthRecord {
   bodyFat?: number;
 }
 
+export interface MediaRecord {
+  id: string;
+  mediaType: 'photo' | 'video';
+  timestamp: string;
+  date: string;
+  photoType?: 'halfBody' | 'fullBody' | 'meal';
+  url: string;
+  thumbnailUrl: string;
+  duration?: number; // seconds, for video
+  tags: string[];
+  notes?: string;
+  relatedData?: {
+    weight?: number;
+    dayNumber?: number;
+  };
+}
+
+export interface VideoEditTask {
+  id: string;
+  status: 'idle' | 'selecting' | 'processing' | 'completed' | 'failed';
+  selectedMediaIds: string[];
+  template: 'simple' | 'nature' | 'motivation' | 'wabisabi';
+  resultUrl?: string;
+  progress: number;
+}
+
 export interface DailyCheckIn {
   date: string;
   meals: {
@@ -57,7 +83,14 @@ export interface DailyCheckIn {
   fastingHours: number;
 }
 
-export type TabType = 'home' | 'checkin' | 'data' | 'profile';
+export type TabType = 'home' | 'checkin' | 'media' | 'data' | 'profile';
+
+export const VIDEO_TEMPLATES: Record<string, { label: string; description: string }> = {
+  simple: { label: '简约', description: '纯白背景，简洁文字' },
+  nature: { label: '自然', description: '自然背景，温暖色调' },
+  motivation: { label: '激励', description: '动感转场，励志文字' },
+  wabisabi: { label: '侘寂', description: '米白背景，质朴文字' },
+};
 
 export const MEAL_LABELS: Record<MealType, string> = {
   breakfast: '早餐',
