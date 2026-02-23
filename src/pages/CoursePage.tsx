@@ -235,7 +235,7 @@ const CoursePage = () => {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="w-full max-w-lg bg-card rounded-t-3xl overflow-hidden max-h-[90vh] overflow-y-auto"
+              className="w-full max-w-lg bg-card rounded-t-3xl overflow-hidden max-h-[85vh] overflow-y-auto mb-16"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}
