@@ -54,7 +54,8 @@ const SubscriptionPage = ({ onBack, isPremium }: SubscriptionPageProps) => {
         <div className="space-y-2">
           {[
             { text: '断食 / 饮水 / 冥想记录', free: true },
-            { text: '体重 / 体脂 / 血糖 / 血压记录', free: false },
+            { text: '体重 / 体脂记录', free: true },
+            { text: '血糖 / 血压记录', free: false },
             { text: '全部课程解锁', free: false },
             { text: 'AI食物识别', free: false },
             { text: '高级数据报告', free: false },

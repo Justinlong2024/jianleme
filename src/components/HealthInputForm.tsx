@@ -69,21 +69,14 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
 
   return (
     <>
-      {!isPremium ? (
-        <div className="w-full wabi-card flex items-center justify-center gap-2 text-muted-foreground text-sm opacity-70">
-          <Lock size={16} />
-          <span>升级会员解锁健康数据记录</span>
-        </div>
-      ) : (
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setOpen(true)}
-          className="w-full wabi-card flex items-center justify-center gap-2 text-primary font-medium text-sm"
-        >
-          <Plus size={18} />
-          记录今日健康数据
-        </motion.button>
-      )}
+      <motion.button
+        whileTap={{ scale: 0.97 }}
+        onClick={() => setOpen(true)}
+        className="w-full wabi-card flex items-center justify-center gap-2 text-primary font-medium text-sm"
+      >
+        <Plus size={18} />
+        记录今日健康数据
+      </motion.button>
 
       <AnimatePresence>
         {open && (
@@ -113,25 +106,34 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
               <div className="p-5 space-y-4">
                 {fields.map((field) => {
                   const Icon = field.icon;
+                  const isLocked = !isPremium && (field.key === 'bloodSugar' || field.key === 'bloodPressureSystolic' || field.key === 'bloodPressureDiastolic');
                   return (
-                    <div key={field.key} className="flex items-center gap-3">
+                    <div key={field.key} className={`flex items-center gap-3 ${isLocked ? 'opacity-50' : ''}`}>
                       <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                        <Icon size={16} className="text-primary" />
+                        {isLocked ? <Lock size={16} className="text-muted-foreground" /> : <Icon size={16} className="text-primary" />}
                       </div>
                       <label className="text-sm text-foreground w-16 shrink-0">{field.label}</label>
                       <div className="flex-1 relative">
-                        <input
-                          type="text"
-                          inputMode="decimal"
-                          placeholder={field.placeholder}
-                          value={values[field.key] || ''}
-                          onChange={(e) => handleChange(field.key, e.target.value)}
-                          maxLength={10}
-                          className="w-full h-10 rounded-xl bg-muted px-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                          {field.unit}
-                        </span>
+                        {isLocked ? (
+                          <div className="w-full h-10 rounded-xl bg-muted px-3 text-sm text-muted-foreground/50 flex items-center">
+                            会员专属
+                          </div>
+                        ) : (
+                          <input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder={field.placeholder}
+                            value={values[field.key] || ''}
+                            onChange={(e) => handleChange(field.key, e.target.value)}
+                            maxLength={10}
+                            className="w-full h-10 rounded-xl bg-muted px-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                          />
+                        )}
+                        {!isLocked && (
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                            {field.unit}
+                          </span>
+                        )}
                       </div>
                     </div>
                   );
