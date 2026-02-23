@@ -117,6 +117,21 @@ const Index = () => {
   const totalPoints = BASE_POINTS + dailyPointsData.total;
   const levelInfo = useMemo(() => getLevelInfo(totalPoints), [totalPoints]);
 
+  // Mock growth history for profile (TODO: from DB)
+  const growthHistory = useMemo(() => {
+    const days = [];
+    const now = new Date();
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const label = `${d.getMonth() + 1}/${d.getDate()}`;
+      // Simulate growing points over time
+      const pts = Math.floor(8 + Math.random() * 35);
+      days.push({ day: label, points: pts });
+    }
+    return days;
+  }, []);
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 6) return '夜深了 🌙';
@@ -312,7 +327,15 @@ const Index = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <ProfilePage />
+            <ProfilePage lifeTree={{
+              level: levelInfo.level,
+              levelLabel: levelInfo.label,
+              totalPoints,
+              pointsInLevel: levelInfo.pointsInLevel,
+              pointsNeeded: levelInfo.pointsNeeded,
+              isMaxLevel: levelInfo.isMaxLevel,
+              growthHistory,
+            }} />
           </motion.div>
         )}
       </AnimatePresence>

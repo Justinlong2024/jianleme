@@ -6,6 +6,21 @@ import NotificationSettingsPage from '@/components/profile/NotificationSettingsP
 import PrivacySettingsPage from '@/components/profile/PrivacySettingsPage';
 import HelpFeedbackPage from '@/components/profile/HelpFeedbackPage';
 import AppSettingsPage from '@/components/profile/AppSettingsPage';
+import LifeTreeProfileCard from '@/components/profile/LifeTreeProfileCard';
+
+interface LifeTreeData {
+  level: number;
+  levelLabel: string;
+  totalPoints: number;
+  pointsInLevel: number;
+  pointsNeeded: number;
+  isMaxLevel: boolean;
+  growthHistory: { day: string; points: number }[];
+}
+
+interface ProfilePageProps {
+  lifeTree?: LifeTreeData;
+}
 
 type SubPage = 'main' | 'subscription' | 'notifications' | 'privacy' | 'help' | 'settings';
 
@@ -17,7 +32,7 @@ const menuItems: { icon: typeof Crown; label: string; subtitle: string; page: Su
   { icon: Settings, label: '应用设置', subtitle: '', page: 'settings' },
 ];
 
-const ProfilePage = () => {
+const ProfilePage = ({ lifeTree }: ProfilePageProps) => {
   const [subPage, setSubPage] = useState<SubPage>('main');
 
   if (subPage === 'subscription') return <SubscriptionPage onBack={() => setSubPage('main')} />;
@@ -64,10 +79,23 @@ const ProfilePage = () => {
           <div className="text-[10px] text-muted-foreground">连续天数</div>
         </div>
         <div>
-          <div className="text-xl font-bold text-primary">Lv.3</div>
+          <div className="text-xl font-bold text-primary">Lv.{lifeTree?.level ?? 1}</div>
           <div className="text-[10px] text-muted-foreground">生命树</div>
         </div>
       </motion.div>
+
+      {/* Life Tree Detail Card */}
+      {lifeTree && (
+        <LifeTreeProfileCard
+          level={lifeTree.level}
+          levelLabel={lifeTree.levelLabel}
+          totalPoints={lifeTree.totalPoints}
+          pointsInLevel={lifeTree.pointsInLevel}
+          pointsNeeded={lifeTree.pointsNeeded}
+          isMaxLevel={lifeTree.isMaxLevel}
+          growthHistory={lifeTree.growthHistory}
+        />
+      )}
 
       {/* Menu */}
       <div className="wabi-card !p-0 overflow-hidden">
