@@ -13,15 +13,24 @@ interface CheckInPageProps {
   checkIn: DailyCheckIn;
   onToggleFasting: (mealType: string) => void;
   onAddWater: (amount: number) => void;
+  onAddFoodToMeal: (foods: { name: string; portion: string; calories: number; protein: number; carbs: number; fat: number }[]) => void;
 }
 
-const CheckInPage = ({ checkIn, onToggleFasting, onAddWater }: CheckInPageProps) => {
+const getMealLabel = () => {
+  const hour = new Date().getHours();
+  if (hour < 10) return '早餐';
+  if (hour < 15) return '午餐';
+  return '晚餐';
+};
+
+const CheckInPage = ({ checkIn, onToggleFasting, onAddWater, onAddFoodToMeal }: CheckInPageProps) => {
   const [showAnalyzer, setShowAnalyzer] = useState(false);
   const meditationMinutes = checkIn.meditationRecords.reduce((s, r) => s + r.duration, 0);
 
   const handleAnalysisComplete = (result: FoodAnalysisResult) => {
+    onAddFoodToMeal(result.foods);
     toast({
-      title: '分析完成 ✨',
+      title: '已记录到' + getMealLabel() + ' ✨',
       description: `识别了 ${result.foods.length} 种食物，共 ${result.totalCalories} 千卡`,
     });
   };
