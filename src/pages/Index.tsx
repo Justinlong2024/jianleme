@@ -151,6 +151,7 @@ const Index = () => {
               totalWater={checkIn.totalWater}
               meditationMinutes={meditationMinutes}
               streakDays={7}
+              fastingMealCount={[checkIn.meals.breakfast, checkIn.meals.lunch, checkIn.meals.dinner].filter(m => m.isFasting).length}
             />
 
             {/* Meals Section */}
