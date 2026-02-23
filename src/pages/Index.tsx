@@ -46,6 +46,37 @@ const Index = () => {
     }));
   }, []);
 
+  const getMealTypeByTime = (): 'breakfast' | 'lunch' | 'dinner' => {
+    const hour = new Date().getHours();
+    if (hour < 10) return 'breakfast';
+    if (hour < 15) return 'lunch';
+    return 'dinner';
+  };
+
+  const handleAddFoodToMeal = useCallback((foods: { name: string; portion: string; calories: number; protein: number; carbs: number; fat: number }[]) => {
+    const mealType = getMealTypeByTime();
+    const foodItems = foods.map(f => ({
+      name: f.name,
+      calories: f.calories,
+      protein: f.protein,
+      carbs: f.carbs,
+      fat: f.fat,
+      portion: f.portion,
+    }));
+    const addedCalories = foodItems.reduce((s, f) => s + f.calories, 0);
+    setCheckIn((prev) => ({
+      ...prev,
+      meals: {
+        ...prev.meals,
+        [mealType]: {
+          ...prev.meals[mealType],
+          isFasting: false,
+          foodItems: [...(prev.meals[mealType].foodItems || []), ...foodItems],
+        },
+      },
+      totalCalories: prev.totalCalories + addedCalories,
+    }));
+  }, []);
   const meditationMinutes = checkIn.meditationRecords.reduce((s, r) => s + r.duration, 0);
 
   const getGreeting = () => {
@@ -132,7 +163,7 @@ const Index = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <CheckInPage checkIn={checkIn} onToggleFasting={handleToggleFasting} onAddWater={handleAddWater} />
+            <CheckInPage checkIn={checkIn} onToggleFasting={handleToggleFasting} onAddWater={handleAddWater} onAddFoodToMeal={handleAddFoodToMeal} />
           </motion.div>
         )}
 
