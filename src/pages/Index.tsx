@@ -239,19 +239,22 @@ const Index = () => {
             {/* Health Data Section */}
             <div className="mt-5">
               <HealthInputForm onSave={handleAddHealthRecord} isPremium={isPremium} />
-              {isPremium && (() => {
+              {(() => {
                 const latest = weightData[weightData.length - 1];
                 const first = weightData[0];
                 const weightChange = latest?.weight && first?.weight ? (latest.weight - first.weight).toFixed(1) : null;
                 const fatChange = latest?.bodyFat && first?.bodyFat ? (latest.bodyFat - first.bodyFat).toFixed(1) : null;
                 const bp = latest?.bloodPressureSystolic && latest?.bloodPressureDiastolic
                   ? `${latest.bloodPressureSystolic}/${latest.bloodPressureDiastolic}` : '--/--';
-                const metrics = [
+                const freeMetrics = [
                   { label: '体重', value: latest?.weight ? `${latest.weight} kg` : '--', icon: Activity, change: weightChange ? `${parseFloat(weightChange) <= 0 ? '' : '+'}${weightChange}kg` : '暂无', positive: weightChange ? parseFloat(weightChange) <= 0 : true },
                   { label: '体脂率', value: latest?.bodyFat ? `${latest.bodyFat}%` : '--', icon: TrendingUp, change: fatChange ? `${parseFloat(fatChange) <= 0 ? '' : '+'}${fatChange}%` : '暂无', positive: fatChange ? parseFloat(fatChange) <= 0 : true },
+                ];
+                const premiumMetrics = [
                   { label: '空腹血糖', value: latest?.bloodSugar ? `${latest.bloodSugar} mmol/L` : '--', icon: Droplet, change: latest?.bloodSugar ? (latest.bloodSugar <= 6.1 ? '正常' : '偏高') : '暂无', positive: latest?.bloodSugar ? latest.bloodSugar <= 6.1 : true },
                   { label: '血压', value: bp, icon: Heart, change: latest?.bloodPressureSystolic ? (latest.bloodPressureSystolic <= 140 ? '正常' : '偏高') : '暂无', positive: latest?.bloodPressureSystolic ? latest.bloodPressureSystolic <= 140 : true },
                 ];
+                const metrics = isPremium ? [...freeMetrics, ...premiumMetrics] : freeMetrics;
                 return (
                   <div className="grid grid-cols-2 gap-3 mt-3">
                     {metrics.map((m) => {
@@ -272,11 +275,9 @@ const Index = () => {
               })()}
             </div>
 
-            {isPremium && (
-              <div className="mt-4">
-                <WeightChart data={weightData} />
-              </div>
-            )}
+            <div className="mt-4">
+              <WeightChart data={weightData} />
+            </div>
 
             {/* Monthly Summary */}
             {isPremium && (() => {
