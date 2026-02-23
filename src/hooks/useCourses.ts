@@ -20,6 +20,7 @@ export interface CourseDB {
 export const useCourses = (search?: string, category?: string) => {
   return useQuery({
     queryKey: ['courses', search, category],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       let query = supabase.from('courses').select('*').order('created_at', { ascending: false });
       if (category && category !== 'all') {

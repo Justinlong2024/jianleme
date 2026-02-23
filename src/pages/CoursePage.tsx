@@ -108,6 +108,7 @@ const CoursePage = ({ isPremium = false }: { isPremium?: boolean }) => {
 
   // Group courses by category for showing counts
   const allCourses = useCourses(undefined, undefined);
+  const countsLoading = allCourses.isLoading;
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     (allCourses.data || []).forEach((c) => {
@@ -175,7 +176,7 @@ const CoursePage = ({ isPremium = false }: { isPremium?: boolean }) => {
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-semibold text-foreground">{cat.key}</div>
                 <div className="text-[10px] text-muted-foreground">
-                  {categoryCounts[cat.key] || 0} 门课程
+                  {countsLoading ? '加载中...' : `${categoryCounts[cat.key] || 0} 门课程`}
                 </div>
               </div>
               <ChevronRight size={16} className="text-muted-foreground shrink-0" />
