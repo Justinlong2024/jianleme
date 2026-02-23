@@ -107,6 +107,19 @@ const Index = () => {
     return '晚安 🌙';
   };
 
+  // Calculate fasting status based on meals
+  const getFastingStatus = () => {
+    const { breakfast, lunch, dinner } = checkIn.meals;
+    const fastingCount = [breakfast, lunch, dinner].filter(m => m.isFasting).length;
+    const dayNumber = 7; // TODO: replace with real streak from DB
+    if (fastingCount === 3) {
+      return `今天是你辟谷之旅的第 <span class="text-primary font-semibold">${dayNumber}</span> 天`;
+    } else if (fastingCount > 0) {
+      return `今天是你轻断食的第 <span class="text-primary font-semibold">${dayNumber}</span> 天`;
+    }
+    return '今天尚未开始断食';
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <AnimatePresence mode="wait">
@@ -124,9 +137,9 @@ const Index = () => {
                 <h1 className="text-2xl font-bold text-foreground font-serif">
                   {getGreeting()}
                 </h1>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  今天是你辟谷之旅的第 <span className="text-primary font-semibold">7</span> 天
-                </p>
+                <p className="text-sm text-muted-foreground mt-0.5"
+                   dangerouslySetInnerHTML={{ __html: getFastingStatus() }}
+                />
               </div>
               <LifeTree level={3} points={1250} nextLevelPoints={2000} />
             </div>
