@@ -41,6 +41,9 @@ export interface HealthRecord {
   date: string;
   weight?: number;
   bodyFat?: number;
+  bloodSugar?: number;
+  bloodPressureSystolic?: number;
+  bloodPressureDiastolic?: number;
 }
 
 export interface MediaRecord {
