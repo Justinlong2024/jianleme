@@ -7,6 +7,7 @@ interface DailySummaryProps {
   totalWater: number;
   meditationMinutes: number;
   streakDays: number;
+  fastingMealCount: number; // 0-3, how many meals are fasting
 }
 
 const DailySummary = ({
@@ -15,9 +16,13 @@ const DailySummary = ({
   totalWater,
   meditationMinutes,
   streakDays,
+  fastingMealCount,
 }: DailySummaryProps) => {
+  const fastingLabel = fastingMealCount === 3 ? '辟谷' : fastingMealCount > 0 ? '轻断食' : '正常饮食';
+  const fastingColor = fastingMealCount === 3 ? 'text-warning' : fastingMealCount > 0 ? 'text-accent-foreground' : 'text-muted-foreground';
+
   const stats = [
-    { icon: Flame, label: '断食', value: `${fastingHours}h`, color: 'text-warning' },
+    { icon: Flame, label: fastingLabel, value: fastingMealCount === 3 ? '24h' : `${fastingMealCount}餐`, color: fastingColor },
     { icon: Droplets, label: '饮水', value: `${totalWater}ml`, color: 'text-info' },
     { icon: Timer, label: '冥想', value: `${meditationMinutes}min`, color: 'text-secondary' },
     { icon: TreePine, label: '连续', value: `${streakDays}天`, color: 'text-primary' },
