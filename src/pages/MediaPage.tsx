@@ -12,7 +12,7 @@ type ViewMode = 'gallery' | 'capture' | 'edit';
 type MediaFilter = 'all' | 'photo' | 'video';
 
 const MediaPage = () => {
-  const [media] = useState<MediaRecord[]>(generateMockMedia);
+  const [media, setMedia] = useState<MediaRecord[]>(generateMockMedia);
   const [viewMode, setViewMode] = useState<ViewMode>('gallery');
   const [filter, setFilter] = useState<MediaFilter>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -22,6 +22,14 @@ const MediaPage = () => {
   const [progress, setProgress] = useState(0);
   const [previewItem, setPreviewItem] = useState<MediaRecord | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+
+  // Post composer state
+  const [showComposer, setShowComposer] = useState(false);
+  const [composerPreview, setComposerPreview] = useState<string | null>(null);
+  const [composerFile, setComposerFile] = useState<File | null>(null);
+  const [composerText, setComposerText] = useState('');
+  const [composerMediaType, setComposerMediaType] = useState<'photo' | 'video'>('photo');
 
   const filtered = media.filter((m) =>
     filter === 'all' ? true : m.mediaType === filter
@@ -136,9 +144,7 @@ const MediaPage = () => {
             </motion.button>
             <motion.button
               whileTap={{ scale: 0.97 }}
-              onClick={() => {
-                toast({ title: '视频录制', description: '即将支持，敬请期待' });
-              }}
+              onClick={() => videoInputRef.current?.click()}
               className="wabi-card flex items-center gap-3 !p-4"
             >
               <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center">
@@ -151,8 +157,25 @@ const MediaPage = () => {
             </motion.button>
           </div>
 
-          <input ref={fileInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={() => {
-            toast({ title: '照片已上传 📷', description: '记录成功！' });
+          <input ref={fileInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            setComposerFile(file);
+            setComposerPreview(URL.createObjectURL(file));
+            setComposerMediaType('photo');
+            setComposerText('');
+            setShowComposer(true);
+            e.target.value = '';
+          }} />
+          <input ref={videoInputRef} type="file" accept="video/*" capture="environment" className="hidden" onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            setComposerFile(file);
+            setComposerPreview(URL.createObjectURL(file));
+            setComposerMediaType('video');
+            setComposerText('');
+            setShowComposer(true);
+            e.target.value = '';
           }} />
 
           {/* Filter tabs */}
@@ -413,6 +436,9 @@ const MediaPage = () => {
                     </span>
                   ))}
                 </div>
+                {previewItem.notes && (
+                  <p className="text-sm text-foreground mt-3 leading-relaxed">{previewItem.notes}</p>
+                )}
                 {previewItem.relatedData?.weight && (
                   <p className="text-xs text-muted-foreground mt-2">
                     体重：{previewItem.relatedData.weight.toFixed(1)} kg
@@ -424,6 +450,102 @@ const MediaPage = () => {
                 >
                   关闭
                 </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Post Composer Modal */}
+      <AnimatePresence>
+        {showComposer && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-end sm:items-center justify-center"
+            onClick={() => setShowComposer(false)}
+          >
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-5 border-b border-border">
+                <h2 className="font-bold text-foreground">
+                  {composerMediaType === 'photo' ? '📷 发布照片' : '🎬 发布视频'}
+                </h2>
+                <button onClick={() => setShowComposer(false)} className="text-muted-foreground hover:text-foreground">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="p-5 space-y-4">
+                {/* Media preview */}
+                {composerPreview && (
+                  <div className="rounded-2xl overflow-hidden">
+                    {composerMediaType === 'photo' ? (
+                      <img src={composerPreview} alt="预览" className="w-full aspect-[4/3] object-cover" />
+                    ) : (
+                      <video src={composerPreview} className="w-full aspect-[4/3] object-cover" controls />
+                    )}
+                  </div>
+                )}
+
+                {/* Text input */}
+                <textarea
+                  value={composerText}
+                  onChange={(e) => setComposerText(e.target.value.slice(0, 500))}
+                  placeholder="记录此刻的心情，分享你的蜕变故事..."
+                  className="w-full h-28 rounded-xl bg-muted px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"
+                />
+                <div className="flex justify-between items-center px-1">
+                  <p className="text-[10px] text-muted-foreground">记录你的感受、进步或今天的小目标</p>
+                  <span className="text-[10px] text-muted-foreground">{composerText.length}/500</span>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => setShowComposer(false)}
+                    className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
+                  >
+                    取消
+                  </button>
+                  <button
+                    onClick={() => {
+                      const today = new Date();
+                      const dateStr = today.toISOString().split('T')[0];
+                      const newRecord: MediaRecord = {
+                        id: `m-${Date.now()}`,
+                        mediaType: composerMediaType,
+                        timestamp: today.toISOString(),
+                        date: dateStr,
+                        url: composerPreview || '',
+                        thumbnailUrl: composerPreview || '',
+                        tags: [composerMediaType === 'photo' ? '打卡照片' : '打卡视频'],
+                        notes: composerText.trim() || undefined,
+                        relatedData: { dayNumber: 7 },
+                      };
+                      setMedia((prev) => [newRecord, ...prev]);
+                      setShowComposer(false);
+                      setComposerPreview(null);
+                      setComposerFile(null);
+                      setComposerText('');
+                      toast({
+                        title: '发布成功 ✨',
+                        description: composerText.trim() ? '照片和文字已记录' : '照片已记录',
+                      });
+                    }}
+                    className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all"
+                  >
+                    发布
+                  </button>
+                </div>
               </div>
             </motion.div>
           </motion.div>
