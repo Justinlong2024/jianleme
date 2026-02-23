@@ -86,7 +86,7 @@ export interface DailyCheckIn {
   fastingHours: number;
 }
 
-export type TabType = 'home' | 'checkin' | 'media' | 'data' | 'profile';
+export type TabType = 'home' | 'checkin' | 'media' | 'profile';
 
 export const VIDEO_TEMPLATES: Record<string, { label: string; description: string }> = {
   simple: { label: '简约', description: '纯白背景，简洁文字' },
