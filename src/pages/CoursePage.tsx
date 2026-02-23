@@ -95,7 +95,7 @@ const CoursePlayer = ({ course }: { course: CourseDB }) => {
   return null;
 };
 
-const CoursePage = () => {
+const CoursePage = ({ isPremium = false }: { isPremium?: boolean }) => {
   const [activeCategory, setActiveCategory] = useState<CourseCategory | 'all'>('all');
   const [selectedCourse, setSelectedCourse] = useState<CourseDB | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -287,14 +287,14 @@ const CoursePage = () => {
                 {!isPlaying && (
                   <motion.button
                     whileTap={{ scale: 0.97 }}
-                    onClick={selectedCourse.is_free ? handleStartLearning : undefined}
+                    onClick={(selectedCourse.is_free || isPremium) ? handleStartLearning : undefined}
                     className={`w-full py-3.5 rounded-2xl font-semibold text-sm ${
-                      selectedCourse.is_free
+                      (selectedCourse.is_free || isPremium)
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-secondary text-secondary-foreground'
                     }`}
                   >
-                    {selectedCourse.is_free ? '开始学习' : '解锁课程'}
+                    {selectedCourse.is_free || isPremium ? '开始学习' : '🔒 开通会员解锁'}
                   </motion.button>
                 )}
               </div>

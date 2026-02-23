@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Activity, TrendingUp, Droplet, Heart } from 'lucide-react';
+import { X, Plus, Activity, TrendingUp, Droplet, Heart, Lock } from 'lucide-react';
 import { HealthRecord } from '@/types';
 import { toast } from '@/hooks/use-toast';
 
 interface HealthInputFormProps {
   onSave: (record: Omit<HealthRecord, 'id'>) => void;
+  isPremium?: boolean;
 }
 
 const fields = [
@@ -18,7 +19,7 @@ const fields = [
 
 type FieldKey = typeof fields[number]['key'];
 
-const HealthInputForm = ({ onSave }: HealthInputFormProps) => {
+const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) => {
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
 
@@ -68,14 +69,21 @@ const HealthInputForm = ({ onSave }: HealthInputFormProps) => {
 
   return (
     <>
-      <motion.button
-        whileTap={{ scale: 0.97 }}
-        onClick={() => setOpen(true)}
-        className="w-full wabi-card flex items-center justify-center gap-2 text-primary font-medium text-sm"
-      >
-        <Plus size={18} />
-        记录今日健康数据
-      </motion.button>
+      {!isPremium ? (
+        <div className="w-full wabi-card flex items-center justify-center gap-2 text-muted-foreground text-sm opacity-70">
+          <Lock size={16} />
+          <span>升级会员解锁健康数据记录</span>
+        </div>
+      ) : (
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => setOpen(true)}
+          className="w-full wabi-card flex items-center justify-center gap-2 text-primary font-medium text-sm"
+        >
+          <Plus size={18} />
+          记录今日健康数据
+        </motion.button>
+      )}
 
       <AnimatePresence>
         {open && (

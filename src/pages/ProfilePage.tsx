@@ -22,6 +22,7 @@ interface LifeTreeData {
 interface ProfilePageProps {
   lifeTree?: LifeTreeData;
   isAdmin?: boolean;
+  isPremium?: boolean;
   onSignOut?: () => void;
   userEmail?: string;
   displayName?: string;
@@ -37,10 +38,10 @@ const menuItems: { icon: typeof Crown; label: string; subtitle: string; page: Su
   { icon: Settings, label: '应用设置', subtitle: '', page: 'settings' },
 ];
 
-const ProfilePage = ({ lifeTree, isAdmin, onSignOut, userEmail, displayName }: ProfilePageProps) => {
+const ProfilePage = ({ lifeTree, isAdmin, isPremium, onSignOut, userEmail, displayName }: ProfilePageProps) => {
   const [subPage, setSubPage] = useState<SubPage>('main');
 
-  if (subPage === 'subscription') return <SubscriptionPage onBack={() => setSubPage('main')} />;
+  if (subPage === 'subscription') return <SubscriptionPage onBack={() => setSubPage('main')} isPremium={isPremium} />;
   if (subPage === 'notifications') return <NotificationSettingsPage onBack={() => setSubPage('main')} />;
   if (subPage === 'privacy') return <PrivacySettingsPage onBack={() => setSubPage('main')} />;
   if (subPage === 'help') return <HelpFeedbackPage onBack={() => setSubPage('main')} />;
@@ -62,8 +63,8 @@ const ProfilePage = ({ lifeTree, isAdmin, onSignOut, userEmail, displayName }: P
           <h2 className="text-lg font-bold text-foreground">{displayName || '用户'}</h2>
           <p className="text-xs text-muted-foreground">{userEmail || '辟谷第 7 天 · 连续打卡 7 天'}</p>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
-              高级会员
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${isPremium ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+              {isPremium ? '高级会员' : '免费用户'}
             </span>
           </div>
         </div>
