@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import { DailyCheckIn } from '@/types';
 import MealCard from '@/components/MealCard';
 import WaterTracker from '@/components/WaterTracker';
 import MeditationCard from '@/components/MeditationCard';
+import FoodAnalyzer from '@/components/FoodAnalyzer';
 import { Camera, Zap } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FoodAnalysisResult } from '@/services/foodAnalysis';
+import { toast } from '@/hooks/use-toast';
 
 interface CheckInPageProps {
   checkIn: DailyCheckIn;
@@ -12,7 +16,15 @@ interface CheckInPageProps {
 }
 
 const CheckInPage = ({ checkIn, onToggleFasting, onAddWater }: CheckInPageProps) => {
+  const [showAnalyzer, setShowAnalyzer] = useState(false);
   const meditationMinutes = checkIn.meditationRecords.reduce((s, r) => s + r.duration, 0);
+
+  const handleAnalysisComplete = (result: FoodAnalysisResult) => {
+    toast({
+      title: '分析完成 ✨',
+      description: `识别了 ${result.foods.length} 种食物，共 ${result.totalCalories} 千卡`,
+    });
+  };
 
   return (
     <div className="max-w-lg mx-auto px-4 pt-6 pb-20">
@@ -23,6 +35,7 @@ const CheckInPage = ({ checkIn, onToggleFasting, onAddWater }: CheckInPageProps)
       <div className="grid grid-cols-2 gap-3 mb-6">
         <motion.button
           whileTap={{ scale: 0.97 }}
+          onClick={() => setShowAnalyzer(true)}
           className="wabi-card flex items-center gap-3 !p-4"
         >
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -66,6 +79,16 @@ const CheckInPage = ({ checkIn, onToggleFasting, onAddWater }: CheckInPageProps)
       <div className="mt-4">
         <MeditationCard records={checkIn.meditationRecords} totalMinutes={meditationMinutes} />
       </div>
+
+      {/* Food Analyzer Modal */}
+      <AnimatePresence>
+        {showAnalyzer && (
+          <FoodAnalyzer
+            onAnalysisComplete={handleAnalysisComplete}
+            onClose={() => setShowAnalyzer(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
