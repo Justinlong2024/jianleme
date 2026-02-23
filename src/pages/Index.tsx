@@ -12,6 +12,7 @@ import WeightChart from '@/components/WeightChart';
 import CheckInPage from '@/pages/CheckInPage';
 import DataPage from '@/pages/DataPage';
 import ProfilePage from '@/pages/ProfilePage';
+import MediaPage from '@/pages/MediaPage';
 
 const weightData = generateMockWeightData();
 
@@ -132,6 +133,17 @@ const Index = () => {
             exit={{ opacity: 0 }}
           >
             <CheckInPage checkIn={checkIn} onToggleFasting={handleToggleFasting} onAddWater={handleAddWater} />
+          </motion.div>
+        )}
+
+        {activeTab === 'media' && (
+          <motion.div
+            key="media"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <MediaPage />
           </motion.div>
         )}
 
