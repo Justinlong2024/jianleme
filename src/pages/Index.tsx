@@ -225,19 +225,24 @@ const Index = () => {
               fastingMealCount={[checkIn.meals.breakfast, checkIn.meals.lunch, checkIn.meals.dinner].filter(m => m.isFasting).length}
             />
 
-            {/* Meals Section */}
-            <div className="mt-6">
-              <div className="flex items-center justify-between mb-3 px-1">
-                <h2 className="text-sm font-semibold text-muted-foreground">三餐记录</h2>
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowFoodAnalyzer(true)}
-                  className="flex items-center gap-1.5 text-xs font-medium text-primary hover:opacity-80 transition-opacity"
-                >
-                  <Camera size={14} />
-                  AI拍照分析
-                </motion.button>
+            {/* AI Food Analysis Button */}
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setShowFoodAnalyzer(true)}
+              className="mt-6 w-full wabi-card flex items-center gap-3 !p-4"
+            >
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Camera size={20} className="text-primary" />
               </div>
+              <div className="text-left flex-1">
+                <div className="text-sm font-semibold text-foreground">AI拍照分析</div>
+                <div className="text-[10px] text-muted-foreground">拍照识别餐食营养成分</div>
+              </div>
+            </motion.button>
+
+            {/* Meals Section */}
+            <div className="mt-4">
+              <h2 className="text-sm font-semibold text-muted-foreground mb-3 px-1">三餐记录</h2>
               <div className="space-y-2.5">
                 <MealCard meal={checkIn.meals.breakfast} onToggleFasting={handleToggleFasting} />
                 <MealCard meal={checkIn.meals.lunch} onToggleFasting={handleToggleFasting} />
