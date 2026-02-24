@@ -12,7 +12,7 @@ import MeditationCard from '@/components/MeditationCard';
 import WeightChart from '@/components/WeightChart';
 import HealthInputForm from '@/components/HealthInputForm';
 import FoodAnalyzer from '@/components/FoodAnalyzer';
-import { Activity, TrendingUp, Droplet, Heart, Camera } from 'lucide-react';
+import { Activity, TrendingUp, Droplet, Heart } from 'lucide-react';
 import CoursePage from '@/pages/CoursePage';
 import ProfilePage from '@/pages/ProfilePage';
 import MediaPage from '@/pages/MediaPage';
@@ -121,6 +121,21 @@ const Index = () => {
     }));
   }, []);
 
+  const handleAddFoodToMealForType = useCallback((mealType: 'breakfast' | 'lunch' | 'dinner', food: { name: string; portion: string; calories: number; protein: number; carbs: number; fat: number }) => {
+    setCheckIn((prev) => ({
+      ...prev,
+      meals: {
+        ...prev.meals,
+        [mealType]: {
+          ...prev.meals[mealType],
+          isFasting: false,
+          foodItems: [...(prev.meals[mealType].foodItems || []), food],
+        },
+      },
+      totalCalories: prev.totalCalories + food.calories,
+    }));
+  }, []);
+
   const handleAddMeditationRecord = useCallback((record: Omit<import('@/types').MeditationRecord, 'id'>) => {
     setCheckIn((prev) => ({
       ...prev,
@@ -225,28 +240,13 @@ const Index = () => {
               fastingMealCount={[checkIn.meals.breakfast, checkIn.meals.lunch, checkIn.meals.dinner].filter(m => m.isFasting).length}
             />
 
-            {/* AI Food Analysis Button */}
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setShowFoodAnalyzer(true)}
-              className="mt-6 w-full wabi-card flex items-center gap-3 !p-4"
-            >
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Camera size={20} className="text-primary" />
-              </div>
-              <div className="text-left flex-1">
-                <div className="text-sm font-semibold text-foreground">AI拍照分析</div>
-                <div className="text-[10px] text-muted-foreground">拍照识别餐食营养成分</div>
-              </div>
-            </motion.button>
-
             {/* Meals Section */}
-            <div className="mt-4">
+            <div className="mt-6">
               <h2 className="text-sm font-semibold text-muted-foreground mb-3 px-1">三餐记录</h2>
               <div className="space-y-2.5">
-                <MealCard meal={checkIn.meals.breakfast} onToggleFasting={handleToggleFasting} />
-                <MealCard meal={checkIn.meals.lunch} onToggleFasting={handleToggleFasting} />
-                <MealCard meal={checkIn.meals.dinner} onToggleFasting={handleToggleFasting} />
+                <MealCard meal={checkIn.meals.breakfast} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => setShowFoodAnalyzer(true)} onManualAdd={(food) => handleAddFoodToMealForType('breakfast', food)} />
+                <MealCard meal={checkIn.meals.lunch} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => setShowFoodAnalyzer(true)} onManualAdd={(food) => handleAddFoodToMealForType('lunch', food)} />
+                <MealCard meal={checkIn.meals.dinner} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => setShowFoodAnalyzer(true)} onManualAdd={(food) => handleAddFoodToMealForType('dinner', food)} />
               </div>
             </div>
 
