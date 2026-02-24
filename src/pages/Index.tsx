@@ -11,7 +11,8 @@ import WaterTracker from '@/components/WaterTracker';
 import MeditationCard from '@/components/MeditationCard';
 import WeightChart from '@/components/WeightChart';
 import HealthInputForm from '@/components/HealthInputForm';
-import { Activity, TrendingUp, Droplet, Heart } from 'lucide-react';
+import FoodAnalyzer from '@/components/FoodAnalyzer';
+import { Activity, TrendingUp, Droplet, Heart, Camera } from 'lucide-react';
 import CoursePage from '@/pages/CoursePage';
 import ProfilePage from '@/pages/ProfilePage';
 import MediaPage from '@/pages/MediaPage';
@@ -19,6 +20,8 @@ import AuthPage from '@/pages/AuthPage';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { HealthRecord } from '@/types';
+import { FoodAnalysisResult } from '@/services/foodAnalysis';
+import { toast } from '@/hooks/use-toast';
 
 const initialWeightData = generateMockWeightData();
 
@@ -28,6 +31,22 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [checkIn, setCheckIn] = useState(getTodayCheckIn());
   const [weightData, setWeightData] = useState<HealthRecord[]>(initialWeightData);
+  const [showFoodAnalyzer, setShowFoodAnalyzer] = useState(false);
+
+  const getMealLabel = () => {
+    const hour = new Date().getHours();
+    if (hour < 10) return '早餐';
+    if (hour < 15) return '午餐';
+    return '晚餐';
+  };
+
+  const handleAnalysisComplete = useCallback((result: FoodAnalysisResult) => {
+    handleAddFoodToMeal(result.foods);
+    toast({
+      title: '已记录到' + getMealLabel() + ' ✨',
+      description: `识别了 ${result.foods.length} 种食物，共 ${result.totalCalories} 千卡`,
+    });
+  }, []);
 
   const handleAddHealthRecord = useCallback((record: Omit<HealthRecord, 'id'>) => {
     const newRecord: HealthRecord = { ...record, id: `h-${Date.now()}` };
@@ -208,9 +227,17 @@ const Index = () => {
 
             {/* Meals Section */}
             <div className="mt-6">
-              <h2 className="text-sm font-semibold text-muted-foreground mb-3 px-1">
-                三餐记录
-              </h2>
+              <div className="flex items-center justify-between mb-3 px-1">
+                <h2 className="text-sm font-semibold text-muted-foreground">三餐记录</h2>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowFoodAnalyzer(true)}
+                  className="flex items-center gap-1.5 text-xs font-medium text-primary hover:opacity-80 transition-opacity"
+                >
+                  <Camera size={14} />
+                  AI拍照分析
+                </motion.button>
+              </div>
               <div className="space-y-2.5">
                 <MealCard meal={checkIn.meals.breakfast} onToggleFasting={handleToggleFasting} />
                 <MealCard meal={checkIn.meals.lunch} onToggleFasting={handleToggleFasting} />
@@ -309,6 +336,17 @@ const Index = () => {
             })()}
           </motion.div>
         )}
+
+        {/* Food Analyzer Modal */}
+        <AnimatePresence>
+          {showFoodAnalyzer && (
+            <FoodAnalyzer
+              onAnalysisComplete={handleAnalysisComplete}
+              onClose={() => setShowFoodAnalyzer(false)}
+            />
+          )}
+        </AnimatePresence>
+
 
         {activeTab === 'course' && (
           <motion.div
