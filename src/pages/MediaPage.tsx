@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MediaRecord, VIDEO_TEMPLATES } from '@/types';
-import { generateMockMedia } from '@/data/mockMedia';
 import {
   Camera, Video, Image, Film, Check, X, Play, Clock,
   Wand2, ChevronRight, Plus, Calendar, Tag,
