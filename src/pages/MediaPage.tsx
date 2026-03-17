@@ -542,7 +542,7 @@ const MediaPage = () => {
                       thumbnailUrl: composerPreview || '',
                       tags: [composerMediaType === 'photo' ? '打卡照片' : '打卡视频'],
                       notes: composerText.trim() || undefined,
-                      relatedData: { dayNumber: 7 },
+                      relatedData: { dayNumber: 1 },
                     };
                     setMedia((prev) => [newRecord, ...prev]);
                     setShowComposer(false);
