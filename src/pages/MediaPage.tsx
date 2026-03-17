@@ -204,66 +204,78 @@ const MediaPage = () => {
           </div>
 
           {/* Photo/Video Grid */}
-          <div className="grid grid-cols-3 gap-1.5">
-            {filtered.map((item, i) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.02 }}
-                className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group"
-                onClick={() => {
-                  if (isSelecting) toggleSelect(item.id);
-                  else setPreviewItem(item);
-                }}
-              >
-                <img
-                  src={item.thumbnailUrl}
-                  alt={item.tags.join(', ')}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-                {/* Video badge */}
-                {item.mediaType === 'video' && (
-                  <div className="absolute bottom-1 left-1 bg-foreground/60 text-card text-[10px] px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                    <Play size={8} fill="currentColor" />
-                    {item.duration}s
-                  </div>
-                )}
-                {/* Day tag */}
-                {item.relatedData?.dayNumber && (
-                  <div className="absolute top-1 left-1 bg-card/80 backdrop-blur-sm text-foreground text-[9px] px-1.5 py-0.5 rounded-md">
-                    第{item.relatedData.dayNumber}天
-                  </div>
-                )}
-                {/* Weight badge */}
-                {item.relatedData?.weight && (
-                  <div className="absolute top-1 right-1 bg-primary/80 text-primary-foreground text-[9px] px-1.5 py-0.5 rounded-md">
-                    {item.relatedData.weight.toFixed(1)}kg
-                  </div>
-                )}
-                {/* Selection overlay */}
-                {isSelecting && (
-                  <div className={`absolute inset-0 flex items-center justify-center transition-all ${
-                    selectedIds.has(item.id) ? 'bg-primary/30' : 'bg-foreground/10'
-                  }`}>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      selectedIds.has(item.id)
-                        ? 'bg-primary border-primary'
-                        : 'border-card bg-card/50'
-                    }`}>
-                      {selectedIds.has(item.id) && <Check size={14} className="text-primary-foreground" />}
+          {filtered.length > 0 ? (
+            <div className="grid grid-cols-3 gap-1.5">
+              {filtered.map((item, i) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.02 }}
+                  className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group"
+                  onClick={() => {
+                    if (isSelecting) toggleSelect(item.id);
+                    else setPreviewItem(item);
+                  }}
+                >
+                  <img
+                    src={item.thumbnailUrl}
+                    alt={item.tags.join(', ')}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  {/* Video badge */}
+                  {item.mediaType === 'video' && (
+                    <div className="absolute bottom-1 left-1 bg-foreground/60 text-card text-[10px] px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                      <Play size={8} fill="currentColor" />
+                      {item.duration}s
                     </div>
-                  </div>
-                )}
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-all" />
-              </motion.div>
-            ))}
-          </div>
+                  )}
+                  {/* Day tag */}
+                  {item.relatedData?.dayNumber && (
+                    <div className="absolute top-1 left-1 bg-card/80 backdrop-blur-sm text-foreground text-[9px] px-1.5 py-0.5 rounded-md">
+                      第{item.relatedData.dayNumber}天
+                    </div>
+                  )}
+                  {/* Weight badge */}
+                  {item.relatedData?.weight && (
+                    <div className="absolute top-1 right-1 bg-primary/80 text-primary-foreground text-[9px] px-1.5 py-0.5 rounded-md">
+                      {item.relatedData.weight.toFixed(1)}kg
+                    </div>
+                  )}
+                  {/* Selection overlay */}
+                  {isSelecting && (
+                    <div className={`absolute inset-0 flex items-center justify-center transition-all ${
+                      selectedIds.has(item.id) ? 'bg-primary/30' : 'bg-foreground/10'
+                    }`}>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                        selectedIds.has(item.id)
+                          ? 'bg-primary border-primary'
+                          : 'border-card bg-card/50'
+                      }`}>
+                        {selectedIds.has(item.id) && <Check size={14} className="text-primary-foreground" />}
+                      </div>
+                    </div>
+                  )}
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-all" />
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="wabi-card py-10 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+                <Image size={22} />
+              </div>
+              <h3 className="text-base font-semibold text-foreground">还没有任何记录</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                点击上方“拍照打卡”或“录制视频”，开始你的第一条照片记录。
+              </p>
+            </div>
+          )}
 
           {/* One-click edit CTA */}
-          {!isSelecting && (
+          {!isSelecting && media.length > 0 && (
             <motion.button
               whileTap={{ scale: 0.97 }}
               onClick={() => setIsSelecting(true)}
