@@ -471,7 +471,7 @@ const MediaPage = () => {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col"
+              className="w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl max-h-[85vh] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -490,9 +490,9 @@ const MediaPage = () => {
                 {composerPreview && (
                   <div className="rounded-2xl overflow-hidden">
                     {composerMediaType === 'photo' ? (
-                      <img src={composerPreview} alt="预览" className="w-full max-h-[40vh] object-cover" />
+                      <img src={composerPreview} alt="预览" className="w-full max-h-[30vh] object-cover" />
                     ) : (
-                      <video src={composerPreview} className="w-full max-h-[40vh] object-cover" controls />
+                      <video src={composerPreview} className="w-full max-h-[30vh] object-cover" controls />
                     )}
                   </div>
                 )}
@@ -511,7 +511,7 @@ const MediaPage = () => {
               </div>
 
               {/* Sticky bottom actions */}
-              <div className="flex gap-3 p-5 pt-3 border-t border-border bg-card">
+              <div className="flex gap-3 p-5 pt-3 pb-[calc(1.25rem+env(safe-area-inset-bottom))] border-t border-border bg-card shrink-0">
                 <button
                   onClick={() => setShowComposer(false)}
                   className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
