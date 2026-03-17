@@ -484,14 +484,15 @@ const MediaPage = () => {
                 </button>
               </div>
 
-              <div className="p-5 space-y-4">
+              {/* Scrollable content */}
+              <div className="flex-1 overflow-y-auto p-5 space-y-4">
                 {/* Media preview */}
                 {composerPreview && (
                   <div className="rounded-2xl overflow-hidden">
                     {composerMediaType === 'photo' ? (
-                      <img src={composerPreview} alt="预览" className="w-full aspect-[4/3] object-cover" />
+                      <img src={composerPreview} alt="预览" className="w-full max-h-[40vh] object-cover" />
                     ) : (
-                      <video src={composerPreview} className="w-full aspect-[4/3] object-cover" controls />
+                      <video src={composerPreview} className="w-full max-h-[40vh] object-cover" controls />
                     )}
                   </div>
                 )}
@@ -507,45 +508,45 @@ const MediaPage = () => {
                   <p className="text-[10px] text-muted-foreground">记录你的感受、进步或今天的小目标</p>
                   <span className="text-[10px] text-muted-foreground">{composerText.length}/500</span>
                 </div>
+              </div>
 
-                {/* Actions */}
-                <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={() => setShowComposer(false)}
-                    className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
-                  >
-                    取消
-                  </button>
-                  <button
-                    onClick={() => {
-                      const today = new Date();
-                      const dateStr = today.toISOString().split('T')[0];
-                      const newRecord: MediaRecord = {
-                        id: `m-${Date.now()}`,
-                        mediaType: composerMediaType,
-                        timestamp: today.toISOString(),
-                        date: dateStr,
-                        url: composerPreview || '',
-                        thumbnailUrl: composerPreview || '',
-                        tags: [composerMediaType === 'photo' ? '打卡照片' : '打卡视频'],
-                        notes: composerText.trim() || undefined,
-                        relatedData: { dayNumber: 7 },
-                      };
-                      setMedia((prev) => [newRecord, ...prev]);
-                      setShowComposer(false);
-                      setComposerPreview(null);
-                      setComposerFile(null);
-                      setComposerText('');
-                      toast({
-                        title: '发布成功 ✨',
-                        description: composerText.trim() ? '照片和文字已记录' : '照片已记录',
-                      });
-                    }}
-                    className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all"
-                  >
-                    发布
-                  </button>
-                </div>
+              {/* Sticky bottom actions */}
+              <div className="flex gap-3 p-5 pt-3 border-t border-border bg-card">
+                <button
+                  onClick={() => setShowComposer(false)}
+                  className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={() => {
+                    const today = new Date();
+                    const dateStr = today.toISOString().split('T')[0];
+                    const newRecord: MediaRecord = {
+                      id: `m-${Date.now()}`,
+                      mediaType: composerMediaType,
+                      timestamp: today.toISOString(),
+                      date: dateStr,
+                      url: composerPreview || '',
+                      thumbnailUrl: composerPreview || '',
+                      tags: [composerMediaType === 'photo' ? '打卡照片' : '打卡视频'],
+                      notes: composerText.trim() || undefined,
+                      relatedData: { dayNumber: 7 },
+                    };
+                    setMedia((prev) => [newRecord, ...prev]);
+                    setShowComposer(false);
+                    setComposerPreview(null);
+                    setComposerFile(null);
+                    setComposerText('');
+                    toast({
+                      title: '发布成功 ✨',
+                      description: composerText.trim() ? '照片和文字已记录' : '照片已记录',
+                    });
+                  }}
+                  className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all"
+                >
+                  发布
+                </button>
               </div>
             </motion.div>
           </motion.div>
