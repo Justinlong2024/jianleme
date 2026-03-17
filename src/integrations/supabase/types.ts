@@ -62,6 +62,45 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_checkins: {
+        Row: {
+          created_at: string
+          date: string
+          fasting_hours: number | null
+          id: string
+          meals: Json | null
+          meditation_records: Json | null
+          total_calories: number | null
+          total_water: number | null
+          user_id: string
+          water_records: Json | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          fasting_hours?: number | null
+          id?: string
+          meals?: Json | null
+          meditation_records?: Json | null
+          total_calories?: number | null
+          total_water?: number | null
+          user_id: string
+          water_records?: Json | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          fasting_hours?: number | null
+          id?: string
+          meals?: Json | null
+          meditation_records?: Json | null
+          total_calories?: number | null
+          total_water?: number | null
+          user_id?: string
+          water_records?: Json | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
