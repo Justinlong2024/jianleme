@@ -199,7 +199,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 safe-area-top safe-area-bottom">
       <AnimatePresence mode="wait">
         {activeTab === 'home' && (
           <motion.div
