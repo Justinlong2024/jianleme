@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TabType } from '@/types';
-import { getTodayCheckIn, generateMockWeightData } from '@/data/mockData';
+import { generateMockWeightData } from '@/data/mockData';
 import BottomNav from '@/components/BottomNav';
 import DailySummary from '@/components/DailySummary';
 import LifeTree from '@/components/LifeTree';
@@ -19,6 +19,7 @@ import MediaPage from '@/pages/MediaPage';
 import AuthPage from '@/pages/AuthPage';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useCheckIn } from '@/hooks/useCheckIn';
 import { HealthRecord } from '@/types';
 import { FoodAnalysisResult } from '@/services/foodAnalysis';
 import { toast } from '@/hooks/use-toast';
@@ -28,8 +29,18 @@ const initialWeightData = generateMockWeightData();
 const Index = () => {
   const { user, loading: authLoading, isAdmin, signOut } = useAuth();
   const { isPremium, loading: subLoading } = useSubscription(user?.id);
+  const {
+    checkIn,
+    streakDays,
+    loading: checkInLoading,
+    handleToggleFasting,
+    handleAddWater,
+    handleAddFoodToMeal,
+    handleAddFoodToMealForType,
+    handleAddMeditationRecord,
+  } = useCheckIn(user?.id);
+
   const [activeTab, setActiveTab] = useState<TabType>('home');
-  const [checkIn, setCheckIn] = useState(getTodayCheckIn());
   const [weightData, setWeightData] = useState<HealthRecord[]>(initialWeightData);
   const [showFoodAnalyzer, setShowFoodAnalyzer] = useState(false);
 
@@ -46,12 +57,11 @@ const Index = () => {
       title: '已记录到' + getMealLabel() + ' ✨',
       description: `识别了 ${result.foods.length} 种食物，共 ${result.totalCalories} 千卡`,
     });
-  }, []);
+  }, [handleAddFoodToMeal]);
 
   const handleAddHealthRecord = useCallback((record: Omit<HealthRecord, 'id'>) => {
     const newRecord: HealthRecord = { ...record, id: `h-${Date.now()}` };
     setWeightData((prev) => {
-      // Replace today's record if exists, otherwise append
       const todayDate = new Date().toISOString().split('T')[0];
       const existing = prev.findIndex((r) => r.date === todayDate);
       if (existing >= 0) {
@@ -63,98 +73,14 @@ const Index = () => {
     });
   }, []);
 
-  const handleToggleFasting = useCallback((mealType: string) => {
-    setCheckIn((prev) => ({
-      ...prev,
-      meals: {
-        ...prev.meals,
-        [mealType]: {
-          ...prev.meals[mealType as keyof typeof prev.meals],
-          isFasting: !prev.meals[mealType as keyof typeof prev.meals].isFasting,
-        },
-      },
-    }));
-  }, []);
-
-  const handleAddWater = useCallback((amount: number) => {
-    const now = new Date();
-    const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    setCheckIn((prev) => ({
-      ...prev,
-      waterRecords: [
-        ...prev.waterRecords,
-        { id: `w-${Date.now()}`, timestamp: timeStr, amount, waterType: 'purified' as const },
-      ],
-      totalWater: prev.totalWater + amount,
-    }));
-  }, []);
-
-  const getMealTypeByTime = (): 'breakfast' | 'lunch' | 'dinner' => {
-    const hour = new Date().getHours();
-    if (hour < 10) return 'breakfast';
-    if (hour < 15) return 'lunch';
-    return 'dinner';
-  };
-
-  const handleAddFoodToMeal = useCallback((foods: { name: string; portion: string; calories: number; protein: number; carbs: number; fat: number }[]) => {
-    const mealType = getMealTypeByTime();
-    const foodItems = foods.map(f => ({
-      name: f.name,
-      calories: f.calories,
-      protein: f.protein,
-      carbs: f.carbs,
-      fat: f.fat,
-      portion: f.portion,
-    }));
-    const addedCalories = foodItems.reduce((s, f) => s + f.calories, 0);
-    setCheckIn((prev) => ({
-      ...prev,
-      meals: {
-        ...prev.meals,
-        [mealType]: {
-          ...prev.meals[mealType],
-          isFasting: false,
-          foodItems: [...(prev.meals[mealType].foodItems || []), ...foodItems],
-        },
-      },
-      totalCalories: prev.totalCalories + addedCalories,
-    }));
-  }, []);
-
-  const handleAddFoodToMealForType = useCallback((mealType: 'breakfast' | 'lunch' | 'dinner', food: { name: string; portion: string; calories: number; protein: number; carbs: number; fat: number }) => {
-    setCheckIn((prev) => ({
-      ...prev,
-      meals: {
-        ...prev.meals,
-        [mealType]: {
-          ...prev.meals[mealType],
-          isFasting: false,
-          foodItems: [...(prev.meals[mealType].foodItems || []), food],
-        },
-      },
-      totalCalories: prev.totalCalories + food.calories,
-    }));
-  }, []);
-
-  const handleAddMeditationRecord = useCallback((record: Omit<import('@/types').MeditationRecord, 'id'>) => {
-    setCheckIn((prev) => ({
-      ...prev,
-      meditationRecords: [
-        ...prev.meditationRecords,
-        { ...record, id: `m-${Date.now()}` },
-      ],
-    }));
-  }, []);
-
   const meditationMinutes = checkIn.meditationRecords.reduce((s, r) => s + r.duration, 0);
 
   // Life Tree points calculation
   const dailyPointsData = useMemo(() => calculateDailyPoints(checkIn), [checkIn]);
-  const BASE_POINTS = 150; // Simulated historical points (TODO: from DB)
+  const BASE_POINTS = 150;
   const totalPoints = BASE_POINTS + dailyPointsData.total;
   const levelInfo = useMemo(() => getLevelInfo(totalPoints), [totalPoints]);
 
-  // Mock growth history for profile (TODO: from DB)
   const growthHistory = useMemo(() => {
     const days = [];
     const now = new Date();
@@ -162,14 +88,13 @@ const Index = () => {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
       const label = `${d.getMonth() + 1}/${d.getDate()}`;
-      // Simulate growing points over time
       const pts = Math.floor(8 + Math.random() * 35);
       days.push({ day: label, points: pts });
     }
     return days;
   }, []);
 
-  if (authLoading || subLoading) {
+  if (authLoading || subLoading || checkInLoading) {
     return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">加载中...</div>;
   }
 
@@ -185,15 +110,13 @@ const Index = () => {
     return '晚安 🌙';
   };
 
-  // Calculate fasting status based on meals
+  const fastingMealCount = [checkIn.meals.breakfast, checkIn.meals.lunch, checkIn.meals.dinner].filter(m => m.isFasting).length;
+
   const getFastingStatus = () => {
-    const { breakfast, lunch, dinner } = checkIn.meals;
-    const fastingCount = [breakfast, lunch, dinner].filter(m => m.isFasting).length;
-    const dayNumber = fastingCount > 0 ? 1 : 0; // Will be replaced with DB-backed streak
-    if (fastingCount === 3) {
-      return `今天是你辟谷之旅的第 <span class="text-primary font-semibold">${dayNumber}</span> 天`;
-    } else if (fastingCount > 0) {
-      return `今天是你轻断食的第 <span class="text-primary font-semibold">${dayNumber}</span> 天`;
+    if (fastingMealCount === 3) {
+      return `今天是你辟谷之旅的第 <span class="text-primary font-semibold">${streakDays}</span> 天`;
+    } else if (fastingMealCount > 0) {
+      return `今天是你轻断食的第 <span class="text-primary font-semibold">${streakDays}</span> 天`;
     }
     return '今天尚未开始断食';
   };
@@ -241,8 +164,8 @@ const Index = () => {
               totalCalories={checkIn.totalCalories}
               totalWater={checkIn.totalWater}
               meditationMinutes={meditationMinutes}
-              streakDays={[checkIn.meals.breakfast, checkIn.meals.lunch, checkIn.meals.dinner].filter(m => m.isFasting).length > 0 ? 1 : 0}
-              fastingMealCount={[checkIn.meals.breakfast, checkIn.meals.lunch, checkIn.meals.dinner].filter(m => m.isFasting).length}
+              streakDays={streakDays}
+              fastingMealCount={fastingMealCount}
             />
 
             {/* Meals Section */}
@@ -357,7 +280,6 @@ const Index = () => {
           )}
         </AnimatePresence>
 
-
         {activeTab === 'course' && (
           <motion.div
             key="course"
@@ -379,7 +301,6 @@ const Index = () => {
             <MediaPage />
           </motion.div>
         )}
-
 
         {activeTab === 'profile' && (
           <motion.div
