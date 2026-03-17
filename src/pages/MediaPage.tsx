@@ -475,7 +475,7 @@ const MediaPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-end sm:items-center justify-center"
+            className="fixed inset-0 z-[70] bg-background/80 backdrop-blur-sm flex items-end sm:items-center justify-center"
             onClick={() => setShowComposer(false)}
           >
             <motion.div
@@ -483,11 +483,11 @@ const MediaPage = () => {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl max-h-[85vh] flex flex-col"
+              className="w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl max-h-[78dvh] mb-[calc(4.5rem+env(safe-area-inset-bottom))] sm:mb-0 flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-5 border-b border-border">
+              <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
                 <h2 className="font-bold text-foreground">
                   {composerMediaType === 'photo' ? '📷 发布照片' : '🎬 发布视频'}
                 </h2>
@@ -497,14 +497,14 @@ const MediaPage = () => {
               </div>
 
               {/* Scrollable content */}
-              <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {/* Media preview */}
                 {composerPreview && (
                   <div className="rounded-2xl overflow-hidden">
                     {composerMediaType === 'photo' ? (
-                      <img src={composerPreview} alt="预览" className="w-full max-h-[30vh] object-cover" />
+                      <img src={composerPreview} alt="预览" className="w-full max-h-[24dvh] object-cover" />
                     ) : (
-                      <video src={composerPreview} className="w-full max-h-[30vh] object-cover" controls />
+                      <video src={composerPreview} className="w-full max-h-[24dvh] object-cover" controls />
                     )}
                   </div>
                 )}
@@ -514,7 +514,7 @@ const MediaPage = () => {
                   value={composerText}
                   onChange={(e) => setComposerText(e.target.value.slice(0, 500))}
                   placeholder="记录此刻的心情，分享你的蜕变故事..."
-                  className="w-full h-28 rounded-xl bg-muted px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"
+                  className="w-full h-24 rounded-xl bg-muted px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"
                 />
                 <div className="flex justify-between items-center px-1">
                   <p className="text-[10px] text-muted-foreground">记录你的感受、进步或今天的小目标</p>
@@ -523,7 +523,7 @@ const MediaPage = () => {
               </div>
 
               {/* Sticky bottom actions */}
-              <div className="flex gap-3 p-5 pt-3 pb-[calc(1.25rem+env(safe-area-inset-bottom))] border-t border-border bg-card shrink-0">
+              <div className="flex gap-3 p-4 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-border bg-card shrink-0">
                 <button
                   onClick={() => setShowComposer(false)}
                   className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
