@@ -212,9 +212,14 @@ const Index = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h1 className="text-2xl font-bold text-foreground font-serif">
+              <h1 className="text-2xl font-bold text-foreground font-serif">
                   {getGreeting()}
                 </h1>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
+                  {' '}
+                  {new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                </p>
                 <p className="text-sm text-muted-foreground mt-0.5"
                    dangerouslySetInnerHTML={{ __html: getFastingStatus() }}
                 />
