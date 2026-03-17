@@ -490,9 +490,9 @@ const MediaPage = () => {
                 {composerPreview && (
                   <div className="rounded-2xl overflow-hidden">
                     {composerMediaType === 'photo' ? (
-                      <img src={composerPreview} alt="预览" className="w-full max-h-[40vh] object-cover" />
+                      <img src={composerPreview} alt="预览" className="w-full max-h-[30vh] object-cover" />
                     ) : (
-                      <video src={composerPreview} className="w-full max-h-[40vh] object-cover" controls />
+                      <video src={composerPreview} className="w-full max-h-[30vh] object-cover" controls />
                     )}
                   </div>
                 )}
