@@ -189,7 +189,7 @@ const Index = () => {
   const getFastingStatus = () => {
     const { breakfast, lunch, dinner } = checkIn.meals;
     const fastingCount = [breakfast, lunch, dinner].filter(m => m.isFasting).length;
-    const dayNumber = 7; // TODO: replace with real streak from DB
+    const dayNumber = fastingCount > 0 ? 1 : 0; // Will be replaced with DB-backed streak
     if (fastingCount === 3) {
       return `今天是你辟谷之旅的第 <span class="text-primary font-semibold">${dayNumber}</span> 天`;
     } else if (fastingCount > 0) {
