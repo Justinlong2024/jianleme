@@ -17,7 +17,7 @@ const tabs: { key: TabType; label: string; icon: typeof Home }[] = [
 
 const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-area-bottom safe-area-left safe-area-right">
       <div className="max-w-lg mx-auto flex items-center justify-around h-16">
         {tabs.map((tab) => {
           const Icon = tab.icon;
