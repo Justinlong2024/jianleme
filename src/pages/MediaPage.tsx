@@ -12,7 +12,7 @@ type ViewMode = 'gallery' | 'capture' | 'edit';
 type MediaFilter = 'all' | 'photo' | 'video';
 
 const MediaPage = () => {
-  const [media, setMedia] = useState<MediaRecord[]>(generateMockMedia);
+  const [media, setMedia] = useState<MediaRecord[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('gallery');
   const [filter, setFilter] = useState<MediaFilter>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
