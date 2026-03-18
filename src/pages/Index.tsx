@@ -43,6 +43,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [weightData, setWeightData] = useState<HealthRecord[]>(initialWeightData);
   const [showFoodAnalyzer, setShowFoodAnalyzer] = useState(false);
+  const [analyzerMealType, setAnalyzerMealType] = useState<'breakfast' | 'lunch' | 'dinner'>('breakfast');
 
   const getMealLabel = () => {
     const hour = new Date().getHours();
