@@ -24,7 +24,7 @@ import { HealthRecord } from '@/types';
 import { FoodAnalysisResult } from '@/services/foodAnalysis';
 import { toast } from '@/hooks/use-toast';
 
-const initialWeightData = generateMockWeightData();
+
 
 const Index = () => {
   const { user, loading: authLoading, isAdmin, signOut } = useAuth();
