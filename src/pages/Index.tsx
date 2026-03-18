@@ -78,8 +78,7 @@ const Index = () => {
 
   // Life Tree points calculation
   const dailyPointsData = useMemo(() => calculateDailyPoints(checkIn), [checkIn]);
-  const BASE_POINTS = 150;
-  const totalPoints = BASE_POINTS + dailyPointsData.total;
+  const totalPoints = dailyPointsData.total;
   const levelInfo = useMemo(() => getLevelInfo(totalPoints), [totalPoints]);
 
   const growthHistory = useMemo(() => {
