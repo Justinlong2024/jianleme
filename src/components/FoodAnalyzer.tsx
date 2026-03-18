@@ -62,7 +62,7 @@ const FoodAnalyzer = ({ onAnalysisComplete, onClose }: FoodAnalyzerProps) => {
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl mb-[calc(env(safe-area-inset-bottom,0px)+5rem)] sm:mb-0 max-h-[calc(100dvh-6rem-env(safe-area-inset-bottom,0px))] overflow-y-auto"
+        className="w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl mb-[calc(env(safe-area-inset-bottom,0px)+5rem)] sm:mb-0 max-h-[calc(100dvh-6rem-env(safe-area-inset-bottom,0px))] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -76,7 +76,7 @@ const FoodAnalyzer = ({ onAnalysisComplete, onClose }: FoodAnalyzerProps) => {
           </button>
         </div>
 
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4 overflow-y-auto flex-1">
           {/* Upload area */}
           {!preview && (
             <motion.button
@@ -215,24 +215,37 @@ const FoodAnalyzer = ({ onAnalysisComplete, onClose }: FoodAnalyzerProps) => {
                   )}
                 </AnimatePresence>
 
-                {/* Actions */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => { setPreview(null); setResult(null); }}
-                    className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
-                  >
-                    重新拍照
-                  </button>
-                  <button
-                    onClick={onClose}
-                    className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all"
-                  >
-                    确认保存
-                  </button>
-                </div>
+                {/* Actions in sticky footer */}
               </motion.div>
             )}
           </AnimatePresence>
+        </div>
+
+        {/* Sticky bottom actions */}
+        <div className="sticky bottom-0 bg-card p-5 pt-3 border-t border-border flex gap-3">
+          {result ? (
+            <>
+              <button
+                onClick={() => { setPreview(null); setResult(null); }}
+                className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
+              >
+                重新拍照
+              </button>
+              <button
+                onClick={onClose}
+                className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all"
+              >
+                确认保存
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={onClose}
+              className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
+            >
+              取消
+            </button>
+          )}
         </div>
       </motion.div>
     </motion.div>

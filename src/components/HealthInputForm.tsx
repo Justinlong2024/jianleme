@@ -92,7 +92,7 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl mb-[calc(env(safe-area-inset-bottom,0px)+5rem)] sm:mb-0 max-h-[calc(100dvh-6rem-env(safe-area-inset-bottom,0px))] overflow-y-auto"
+              className="w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl mb-[calc(env(safe-area-inset-bottom,0px)+5rem)] sm:mb-0 max-h-[calc(100dvh-6rem-env(safe-area-inset-bottom,0px))] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -103,7 +103,7 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
                 </button>
               </div>
 
-              <div className="p-5 space-y-4">
+              <div className="p-5 space-y-4 overflow-y-auto flex-1">
                 {fields.map((field) => {
                   const Icon = field.icon;
                   const isLocked = !isPremium && (field.key === 'bloodSugar' || field.key === 'bloodPressureSystolic' || field.key === 'bloodPressureDiastolic');
@@ -143,22 +143,22 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
                 <p className="text-[10px] text-muted-foreground px-1">
                   血压请分别填写收缩压（高压）和舒张压（低压）
                 </p>
+              </div>
 
-                {/* Actions */}
-                <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={() => setOpen(false)}
-                    className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
-                  >
-                    取消
-                  </button>
-                  <button
-                    onClick={handleSubmit}
-                    className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all"
-                  >
-                    保存记录
-                  </button>
-                </div>
+              {/* Sticky bottom actions */}
+              <div className="sticky bottom-0 bg-card p-5 pt-3 border-t border-border flex gap-3">
+                <button
+                  onClick={() => setOpen(false)}
+                  className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all"
+                >
+                  保存记录
+                </button>
               </div>
             </motion.div>
           </motion.div>
