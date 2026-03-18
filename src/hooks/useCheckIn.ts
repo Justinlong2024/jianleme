@@ -20,6 +20,7 @@ const getEmptyCheckIn = (): DailyCheckIn => ({
 export const useCheckIn = (userId: string | undefined) => {
   const [checkIn, setCheckIn] = useState<DailyCheckIn>(getEmptyCheckIn());
   const [streakDays, setStreakDays] = useState(0);
+  const [totalCheckIns, setTotalCheckIns] = useState(0);
   const [loading, setLoading] = useState(true);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitialLoad = useRef(true);
