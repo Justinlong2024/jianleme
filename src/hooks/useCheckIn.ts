@@ -72,12 +72,12 @@ export const useCheckIn = (userId: string | undefined) => {
           .order('date', { ascending: false });
 
         if (history && history.length > 0) {
+          setTotalCheckIns(history.length);
           const historyRecords = history.map(h => ({
             date: h.date,
             meals: h.meals as any || {},
           }));
 
-          // Check if today has fasting
           const todayMeals = todayData?.meals as any;
           const todayHasFasting = todayMeals
             ? [todayMeals.breakfast?.isFasting, todayMeals.lunch?.isFasting, todayMeals.dinner?.isFasting].some(Boolean)
