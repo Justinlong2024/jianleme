@@ -40,7 +40,7 @@ const Index = () => {
   } = useCheckIn(user?.id);
 
   const [activeTab, setActiveTab] = useState<TabType>('home');
-  const [weightData, setWeightData] = useState<HealthRecord[]>(initialWeightData);
+  const [weightData, setWeightData] = useState<HealthRecord[]>([]);
   const [showFoodAnalyzer, setShowFoodAnalyzer] = useState(false);
   const [analyzerMealType, setAnalyzerMealType] = useState<'breakfast' | 'lunch' | 'dinner'>('breakfast');
 
