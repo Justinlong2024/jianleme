@@ -32,6 +32,7 @@ const Index = () => {
   const {
     checkIn,
     streakDays,
+    totalCheckIns,
     loading: checkInLoading,
     handleToggleFasting,
     handleAddWater,
