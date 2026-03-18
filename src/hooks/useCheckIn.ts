@@ -236,6 +236,7 @@ export const useCheckIn = (userId: string | undefined) => {
     checkIn,
     setCheckIn,
     streakDays,
+    totalCheckIns,
     loading,
     handleToggleFasting,
     handleAddWater,
