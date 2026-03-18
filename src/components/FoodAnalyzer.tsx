@@ -62,7 +62,7 @@ const FoodAnalyzer = ({ onAnalysisComplete, onClose }: FoodAnalyzerProps) => {
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl mb-[calc(env(safe-area-inset-bottom,0px)+5rem)] sm:mb-0 max-h-[calc(100dvh-6rem-env(safe-area-inset-bottom,0px))] overflow-y-auto"
+        className="w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl mb-[calc(env(safe-area-inset-bottom,0px)+5rem)] sm:mb-0 max-h-[calc(100dvh-6rem-env(safe-area-inset-bottom,0px))] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
