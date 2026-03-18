@@ -52,13 +52,20 @@ const Index = () => {
     return '晚餐';
   };
 
+  const mealLabelMap = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' };
+
+  const openAnalyzerForMeal = useCallback((mealType: 'breakfast' | 'lunch' | 'dinner') => {
+    setAnalyzerMealType(mealType);
+    setShowFoodAnalyzer(true);
+  }, []);
+
   const handleAnalysisComplete = useCallback((result: FoodAnalysisResult) => {
-    handleAddFoodToMeal(result.foods);
+    result.foods.forEach(food => handleAddFoodToMealForType(analyzerMealType, food));
     toast({
-      title: '已记录到' + getMealLabel() + ' ✨',
+      title: `已记录到${mealLabelMap[analyzerMealType]} ✨`,
       description: `识别了 ${result.foods.length} 种食物，共 ${result.totalCalories} 千卡`,
     });
-  }, [handleAddFoodToMeal]);
+  }, [handleAddFoodToMealForType, analyzerMealType]);
 
   const handleAddHealthRecord = useCallback((record: Omit<HealthRecord, 'id'>) => {
     const newRecord: HealthRecord = { ...record, id: `h-${Date.now()}` };
