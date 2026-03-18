@@ -236,7 +236,7 @@ const Index = () => {
               })()}
             </div>
 
-            <div className="mt-4">
+            <div className="mt-4 mb-[calc(env(safe-area-inset-bottom,0px)+6rem)]">
               <WeightChart data={weightData} />
             </div>
 
