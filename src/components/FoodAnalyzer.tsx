@@ -215,21 +215,38 @@ const FoodAnalyzer = ({ onAnalysisComplete, onClose }: FoodAnalyzerProps) => {
                   )}
                 </AnimatePresence>
 
-                {/* Actions */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => { setPreview(null); setResult(null); }}
-                    className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
-                  >
-                    重新拍照
-                  </button>
-                  <button
-                    onClick={onClose}
-                    className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all"
-                  >
-                    确认保存
-                  </button>
-                </div>
+                {/* Actions in sticky footer */}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Sticky bottom actions */}
+        <div className="sticky bottom-0 bg-card p-5 pt-3 border-t border-border flex gap-3">
+          {result ? (
+            <>
+              <button
+                onClick={() => { setPreview(null); setResult(null); }}
+                className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
+              >
+                重新拍照
+              </button>
+              <button
+                onClick={onClose}
+                className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all"
+              >
+                确认保存
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={onClose}
+              className="flex-1 h-11 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-all"
+            >
+              取消
+            </button>
+          )}
+        </div>
               </motion.div>
             )}
           </AnimatePresence>
