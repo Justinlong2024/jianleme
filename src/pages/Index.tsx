@@ -180,9 +180,9 @@ const Index = () => {
             <div className="mt-6">
               <h2 className="text-sm font-semibold text-muted-foreground mb-3 px-1">三餐记录</h2>
               <div className="space-y-2.5">
-                <MealCard meal={checkIn.meals.breakfast} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => setShowFoodAnalyzer(true)} onManualAdd={(food) => handleAddFoodToMealForType('breakfast', food)} />
-                <MealCard meal={checkIn.meals.lunch} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => setShowFoodAnalyzer(true)} onManualAdd={(food) => handleAddFoodToMealForType('lunch', food)} />
-                <MealCard meal={checkIn.meals.dinner} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => setShowFoodAnalyzer(true)} onManualAdd={(food) => handleAddFoodToMealForType('dinner', food)} />
+                <MealCard meal={checkIn.meals.breakfast} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => openAnalyzerForMeal('breakfast')} onManualAdd={(food) => handleAddFoodToMealForType('breakfast', food)} />
+                <MealCard meal={checkIn.meals.lunch} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => openAnalyzerForMeal('lunch')} onManualAdd={(food) => handleAddFoodToMealForType('lunch', food)} />
+                <MealCard meal={checkIn.meals.dinner} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => openAnalyzerForMeal('dinner')} onManualAdd={(food) => handleAddFoodToMealForType('dinner', food)} />
               </div>
             </div>
 
