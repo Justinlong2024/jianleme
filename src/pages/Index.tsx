@@ -82,16 +82,8 @@ const Index = () => {
   const levelInfo = useMemo(() => getLevelInfo(totalPoints), [totalPoints]);
 
   const growthHistory = useMemo(() => {
-    const days = [];
-    const now = new Date();
-    for (let i = 13; i >= 0; i--) {
-      const d = new Date(now);
-      d.setDate(d.getDate() - i);
-      const label = `${d.getMonth() + 1}/${d.getDate()}`;
-      const pts = Math.floor(8 + Math.random() * 35);
-      days.push({ day: label, points: pts });
-    }
-    return days;
+    // Empty for new users - will be populated from real check-in history
+    return [];
   }, []);
 
   if (authLoading || subLoading || checkInLoading) {
