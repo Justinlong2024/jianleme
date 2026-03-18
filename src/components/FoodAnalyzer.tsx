@@ -247,10 +247,6 @@ const FoodAnalyzer = ({ onAnalysisComplete, onClose }: FoodAnalyzerProps) => {
             </button>
           )}
         </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
       </motion.div>
     </motion.div>
   );
