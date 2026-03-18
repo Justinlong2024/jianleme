@@ -44,12 +44,6 @@ const Index = () => {
   const [showFoodAnalyzer, setShowFoodAnalyzer] = useState(false);
   const [analyzerMealType, setAnalyzerMealType] = useState<'breakfast' | 'lunch' | 'dinner'>('breakfast');
 
-  const getMealLabel = () => {
-    const hour = new Date().getHours();
-    if (hour < 10) return '早餐';
-    if (hour < 15) return '午餐';
-    return '晚餐';
-  };
 
   const mealLabelMap = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' };
 
