@@ -26,6 +26,8 @@ interface ProfilePageProps {
   onSignOut?: () => void;
   userEmail?: string;
   displayName?: string;
+  totalCheckIns?: number;
+  streakDays?: number;
 }
 
 type SubPage = 'main' | 'subscription' | 'notifications' | 'privacy' | 'help' | 'settings' | 'admin-courses';
