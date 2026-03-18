@@ -35,7 +35,6 @@ const Index = () => {
     loading: checkInLoading,
     handleToggleFasting,
     handleAddWater,
-    handleAddFoodToMeal,
     handleAddFoodToMealForType,
     handleAddMeditationRecord,
   } = useCheckIn(user?.id);
