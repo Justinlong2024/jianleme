@@ -35,7 +35,6 @@ const Index = () => {
     loading: checkInLoading,
     handleToggleFasting,
     handleAddWater,
-    handleAddFoodToMeal,
     handleAddFoodToMealForType,
     handleAddMeditationRecord,
   } = useCheckIn(user?.id);
@@ -43,21 +42,23 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [weightData, setWeightData] = useState<HealthRecord[]>(initialWeightData);
   const [showFoodAnalyzer, setShowFoodAnalyzer] = useState(false);
+  const [analyzerMealType, setAnalyzerMealType] = useState<'breakfast' | 'lunch' | 'dinner'>('breakfast');
 
-  const getMealLabel = () => {
-    const hour = new Date().getHours();
-    if (hour < 10) return '早餐';
-    if (hour < 15) return '午餐';
-    return '晚餐';
-  };
+
+  const mealLabelMap = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' };
+
+  const openAnalyzerForMeal = useCallback((mealType: 'breakfast' | 'lunch' | 'dinner') => {
+    setAnalyzerMealType(mealType);
+    setShowFoodAnalyzer(true);
+  }, []);
 
   const handleAnalysisComplete = useCallback((result: FoodAnalysisResult) => {
-    handleAddFoodToMeal(result.foods);
+    result.foods.forEach(food => handleAddFoodToMealForType(analyzerMealType, food));
     toast({
-      title: '已记录到' + getMealLabel() + ' ✨',
+      title: `已记录到${mealLabelMap[analyzerMealType]} ✨`,
       description: `识别了 ${result.foods.length} 种食物，共 ${result.totalCalories} 千卡`,
     });
-  }, [handleAddFoodToMeal]);
+  }, [handleAddFoodToMealForType, analyzerMealType]);
 
   const handleAddHealthRecord = useCallback((record: Omit<HealthRecord, 'id'>) => {
     const newRecord: HealthRecord = { ...record, id: `h-${Date.now()}` };
@@ -172,9 +173,9 @@ const Index = () => {
             <div className="mt-6">
               <h2 className="text-sm font-semibold text-muted-foreground mb-3 px-1">三餐记录</h2>
               <div className="space-y-2.5">
-                <MealCard meal={checkIn.meals.breakfast} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => setShowFoodAnalyzer(true)} onManualAdd={(food) => handleAddFoodToMealForType('breakfast', food)} />
-                <MealCard meal={checkIn.meals.lunch} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => setShowFoodAnalyzer(true)} onManualAdd={(food) => handleAddFoodToMealForType('lunch', food)} />
-                <MealCard meal={checkIn.meals.dinner} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => setShowFoodAnalyzer(true)} onManualAdd={(food) => handleAddFoodToMealForType('dinner', food)} />
+                <MealCard meal={checkIn.meals.breakfast} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => openAnalyzerForMeal('breakfast')} onManualAdd={(food) => handleAddFoodToMealForType('breakfast', food)} />
+                <MealCard meal={checkIn.meals.lunch} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => openAnalyzerForMeal('lunch')} onManualAdd={(food) => handleAddFoodToMealForType('lunch', food)} />
+                <MealCard meal={checkIn.meals.dinner} onToggleFasting={handleToggleFasting} onOpenAnalyzer={() => openAnalyzerForMeal('dinner')} onManualAdd={(food) => handleAddFoodToMealForType('dinner', food)} />
               </div>
             </div>
 
