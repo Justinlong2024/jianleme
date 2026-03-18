@@ -40,7 +40,7 @@ const menuItems: { icon: typeof Crown; label: string; subtitle: string; page: Su
   { icon: Settings, label: '应用设置', subtitle: '', page: 'settings' },
 ];
 
-const ProfilePage = ({ lifeTree, isAdmin, isPremium, onSignOut, userEmail, displayName }: ProfilePageProps) => {
+const ProfilePage = ({ lifeTree, isAdmin, isPremium, onSignOut, userEmail, displayName, totalCheckIns = 0, streakDays = 0 }: ProfilePageProps) => {
   const [subPage, setSubPage] = useState<SubPage>('main');
 
   if (subPage === 'subscription') return <SubscriptionPage onBack={() => setSubPage('main')} isPremium={isPremium} />;
