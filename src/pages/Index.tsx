@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TabType } from '@/types';
-import { generateMockWeightData } from '@/data/mockData';
+
 import BottomNav from '@/components/BottomNav';
 import DailySummary from '@/components/DailySummary';
 import LifeTree from '@/components/LifeTree';
