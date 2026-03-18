@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TabType } from '@/types';
-import { generateMockWeightData } from '@/data/mockData';
+
 import BottomNav from '@/components/BottomNav';
 import DailySummary from '@/components/DailySummary';
 import LifeTree from '@/components/LifeTree';
@@ -24,7 +24,7 @@ import { HealthRecord } from '@/types';
 import { FoodAnalysisResult } from '@/services/foodAnalysis';
 import { toast } from '@/hooks/use-toast';
 
-const initialWeightData = generateMockWeightData();
+
 
 const Index = () => {
   const { user, loading: authLoading, isAdmin, signOut } = useAuth();
@@ -32,6 +32,7 @@ const Index = () => {
   const {
     checkIn,
     streakDays,
+    totalCheckIns,
     loading: checkInLoading,
     handleToggleFasting,
     handleAddWater,
@@ -40,7 +41,7 @@ const Index = () => {
   } = useCheckIn(user?.id);
 
   const [activeTab, setActiveTab] = useState<TabType>('home');
-  const [weightData, setWeightData] = useState<HealthRecord[]>(initialWeightData);
+  const [weightData, setWeightData] = useState<HealthRecord[]>([]);
   const [showFoodAnalyzer, setShowFoodAnalyzer] = useState(false);
   const [analyzerMealType, setAnalyzerMealType] = useState<'breakfast' | 'lunch' | 'dinner'>('breakfast');
 
@@ -78,21 +79,12 @@ const Index = () => {
 
   // Life Tree points calculation
   const dailyPointsData = useMemo(() => calculateDailyPoints(checkIn), [checkIn]);
-  const BASE_POINTS = 150;
-  const totalPoints = BASE_POINTS + dailyPointsData.total;
+  const totalPoints = dailyPointsData.total;
   const levelInfo = useMemo(() => getLevelInfo(totalPoints), [totalPoints]);
 
   const growthHistory = useMemo(() => {
-    const days = [];
-    const now = new Date();
-    for (let i = 13; i >= 0; i--) {
-      const d = new Date(now);
-      d.setDate(d.getDate() - i);
-      const label = `${d.getMonth() + 1}/${d.getDate()}`;
-      const pts = Math.floor(8 + Math.random() * 35);
-      days.push({ day: label, points: pts });
-    }
-    return days;
+    // Empty for new users - will be populated from real check-in history
+    return [];
   }, []);
 
   if (authLoading || subLoading || checkInLoading) {
@@ -325,6 +317,8 @@ const Index = () => {
               onSignOut={signOut}
               userEmail={user.email}
               displayName={user.user_metadata?.display_name}
+              totalCheckIns={totalCheckIns}
+              streakDays={streakDays}
             />
           </motion.div>
         )}

@@ -20,6 +20,7 @@ const getEmptyCheckIn = (): DailyCheckIn => ({
 export const useCheckIn = (userId: string | undefined) => {
   const [checkIn, setCheckIn] = useState<DailyCheckIn>(getEmptyCheckIn());
   const [streakDays, setStreakDays] = useState(0);
+  const [totalCheckIns, setTotalCheckIns] = useState(0);
   const [loading, setLoading] = useState(true);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitialLoad = useRef(true);
@@ -71,12 +72,12 @@ export const useCheckIn = (userId: string | undefined) => {
           .order('date', { ascending: false });
 
         if (history && history.length > 0) {
+          setTotalCheckIns(history.length);
           const historyRecords = history.map(h => ({
             date: h.date,
             meals: h.meals as any || {},
           }));
 
-          // Check if today has fasting
           const todayMeals = todayData?.meals as any;
           const todayHasFasting = todayMeals
             ? [todayMeals.breakfast?.isFasting, todayMeals.lunch?.isFasting, todayMeals.dinner?.isFasting].some(Boolean)
@@ -235,6 +236,7 @@ export const useCheckIn = (userId: string | undefined) => {
     checkIn,
     setCheckIn,
     streakDays,
+    totalCheckIns,
     loading,
     handleToggleFasting,
     handleAddWater,
