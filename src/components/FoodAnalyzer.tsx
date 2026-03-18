@@ -76,7 +76,7 @@ const FoodAnalyzer = ({ onAnalysisComplete, onClose }: FoodAnalyzerProps) => {
           </button>
         </div>
 
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4 overflow-y-auto flex-1">
           {/* Upload area */}
           {!preview && (
             <motion.button
