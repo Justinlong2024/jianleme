@@ -317,6 +317,8 @@ const Index = () => {
               onSignOut={signOut}
               userEmail={user.email}
               displayName={user.user_metadata?.display_name}
+              totalCheckIns={totalCheckIns}
+              streakDays={streakDays}
             />
           </motion.div>
         )}

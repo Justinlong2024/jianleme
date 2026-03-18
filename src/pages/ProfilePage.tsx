@@ -80,11 +80,11 @@ const ProfilePage = ({ lifeTree, isAdmin, isPremium, onSignOut, userEmail, displ
         className="wabi-card grid grid-cols-3 gap-4 text-center mb-5"
       >
         <div>
-          <div className="text-xl font-bold text-foreground">45</div>
+          <div className="text-xl font-bold text-foreground">{totalCheckIns}</div>
           <div className="text-[10px] text-muted-foreground">总打卡</div>
         </div>
         <div>
-          <div className="text-xl font-bold text-foreground">7</div>
+          <div className="text-xl font-bold text-foreground">{streakDays}</div>
           <div className="text-[10px] text-muted-foreground">连续天数</div>
         </div>
         <div>
