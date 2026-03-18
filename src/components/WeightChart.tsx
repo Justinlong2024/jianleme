@@ -161,7 +161,7 @@ const WeightChart = ({ data }: WeightChartProps) => {
       </div>
 
       {/* Chart */}
-      <div className="h-36 -mx-2">
+      <div className="h-48 -mx-2">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
