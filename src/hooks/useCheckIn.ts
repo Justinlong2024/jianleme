@@ -139,7 +139,7 @@ export const useCheckIn = (userId: string | undefined) => {
             .from('daily_checkins')
             .select('date, meals')
             .eq('user_id', userId)
-            .gte('date', new Date(Date.now() - 60 * 86400000).toISOString().split('T')[0])
+            .gte('date', getLocalDateStr(new Date(Date.now() - 60 * 86400000)))
             .order('date', { ascending: false });
 
           if (history) {
