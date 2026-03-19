@@ -3,8 +3,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { DailyCheckIn, MeditationRecord } from '@/types';
 import { calculateFastingStreak } from '@/lib/streakCalculator';
 
+/** Get local date as YYYY-MM-DD without UTC shift */
+const getLocalDateStr = (date = new Date()) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
 const getEmptyCheckIn = (): DailyCheckIn => ({
-  date: new Date().toISOString().split('T')[0],
+  date: getLocalDateStr(),
   meals: {
     breakfast: { mealType: 'breakfast', isFasting: false },
     lunch: { mealType: 'lunch', isFasting: false },
@@ -25,7 +33,7 @@ export const useCheckIn = (userId: string | undefined) => {
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitialLoad = useRef(true);
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateStr();
 
   // Load today's check-in and history for streak
   useEffect(() => {
