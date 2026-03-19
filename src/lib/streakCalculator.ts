@@ -18,6 +18,16 @@ interface CheckInRecord {
  * If today has fasting, returns at least 1.
  * If no history exists but currently fasting, returns 1.
  */
+/**
+ * Get local date string in YYYY-MM-DD format (avoids UTC timezone shift)
+ */
+function getLocalDateStr(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 export function calculateFastingStreak(
   history: CheckInRecord[],
   todayIsFasting: boolean
@@ -28,21 +38,13 @@ export function calculateFastingStreak(
   const sorted = [...history]
     .sort((a, b) => b.date.localeCompare(a.date));
 
-  const today = new Date().toISOString().split('T')[0];
-  let streak = 0;
-  const currentDate = new Date();
+  let streak = 1; // Today counts as day 1
+  const now = new Date();
 
-  // Walk backward from today
-  for (let i = 0; i <= sorted.length; i++) {
-    const checkDate = new Date(currentDate);
-    checkDate.setDate(checkDate.getDate() - i);
-    const dateStr = checkDate.toISOString().split('T')[0];
-
-    if (i === 0) {
-      // Today — we already know it's fasting from the param
-      streak++;
-      continue;
-    }
+  // Walk backward from yesterday
+  for (let i = 1; i <= sorted.length; i++) {
+    const checkDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    const dateStr = getLocalDateStr(checkDate);
 
     const record = sorted.find(r => r.date === dateStr);
     if (!record) break; // No record for this day = streak broken
@@ -60,5 +62,5 @@ export function calculateFastingStreak(
     }
   }
 
-  return Math.max(streak, 1); // At least 1 if today is fasting
+  return streak;
 }
