@@ -3,9 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MediaRecord, VIDEO_TEMPLATES } from '@/types';
 import {
   Camera, Video, Image, Film, Check, X, Play, Clock,
-  Wand2, ChevronRight, Plus, Calendar, Tag, CalendarDays,
+  Wand2, ChevronRight, Plus, Calendar, Tag, CalendarDays, Loader2,
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useMediaRecords } from '@/hooks/useMediaRecords';
+import { useAuth } from '@/hooks/useAuth';
 
 type ViewMode = 'gallery' | 'capture' | 'edit';
 type MediaFilter = 'all' | 'photo' | 'video';
@@ -18,8 +20,10 @@ const getLocalDateStr = (date = new Date()) => {
 };
 
 const MediaPage = () => {
-  const [media, setMedia] = useState<MediaRecord[]>([]);
+  const { user } = useAuth();
+  const { records: media, loading: mediaLoading, addRecord } = useMediaRecords(user?.id);
   const [viewMode, setViewMode] = useState<ViewMode>('gallery');
+  const [publishing, setPublishing] = useState(false);
   const [filter, setFilter] = useState<MediaFilter>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSelecting, setIsSelecting] = useState(false);
@@ -555,35 +559,36 @@ const MediaPage = () => {
                   取消
                 </button>
                 <button
-                  onClick={() => {
+                  disabled={publishing}
+                  onClick={async () => {
+                    if (!composerFile) return;
+                    setPublishing(true);
                     const dateStr = composerDate || getLocalDateStr();
-                    const dateObj = new Date(dateStr + 'T12:00:00');
-                    const newRecord: MediaRecord = {
-                      id: `m-${Date.now()}`,
-                      mediaType: composerMediaType,
-                      timestamp: dateObj.toISOString(),
-                      date: dateStr,
-                      url: composerPreview || '',
-                      thumbnailUrl: composerPreview || '',
-                      tags: [composerMediaType === 'photo' ? '打卡照片' : '打卡视频'],
-                      notes: composerText.trim() || undefined,
-                      relatedData: { dayNumber: 1 },
-                    };
-                    setMedia((prev) => [newRecord, ...prev].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
-                    setShowComposer(false);
-                    setComposerPreview(null);
-                    setComposerFile(null);
-                    setComposerText('');
-                    setComposerDate(getLocalDateStr());
-                    const isToday = dateStr === getLocalDateStr();
-                    toast({
-                      title: '发布成功 ✨',
-                      description: isToday ? '已记录到今日' : `已记录到 ${dateStr}`,
-                    });
+                    const result = await addRecord(
+                      composerFile,
+                      composerMediaType,
+                      dateStr,
+                      composerText.trim() || undefined,
+                    );
+                    setPublishing(false);
+                    if (result) {
+                      setShowComposer(false);
+                      setComposerPreview(null);
+                      setComposerFile(null);
+                      setComposerText('');
+                      setComposerDate(getLocalDateStr());
+                      const isToday = dateStr === getLocalDateStr();
+                      toast({
+                        title: '发布成功 ✨',
+                        description: isToday ? '已记录到今日' : `已记录到 ${dateStr}`,
+                      });
+                    } else {
+                      toast({ title: '发布失败', description: '请检查网络后重试', variant: 'destructive' });
+                    }
                   }}
-                  className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all"
+                  className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all disabled:opacity-50"
                 >
-                  发布
+                  {publishing ? <Loader2 size={16} className="animate-spin mx-auto" /> : '发布'}
                 </button>
               </div>
             </motion.div>
