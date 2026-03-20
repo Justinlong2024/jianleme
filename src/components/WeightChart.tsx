@@ -187,7 +187,7 @@ const WeightChart = ({ data }: WeightChartProps) => {
       {/* Summary */}
       <div className="flex items-center justify-between mb-2">
         <span className="font-semibold text-foreground">
-          {activeTab === 'weight' ? '体重趋势' : activeTab === 'bloodSugar' ? '血糖趋势' : '血压趋势'}
+          {activeTab === 'weight' ? '体重趋势' : activeTab === 'bodyFat' ? '体脂趋势' : activeTab === 'waist' ? '腰围趋势' : activeTab === 'bloodSugar' ? '血糖趋势' : '血压趋势'}
         </span>
         {renderSummary()}
       </div>
