@@ -71,19 +71,35 @@ const MediaPage = () => {
     setEditStep('template');
   };
 
-  const simulateProcessing = () => {
+  const startVideoGeneration = async () => {
     setEditStep('processing');
     setProgress(0);
-    const interval = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 100) {
-          clearInterval(interval);
-          setEditStep('done');
-          return 100;
-        }
-        return p + Math.random() * 8 + 2;
+
+    // Collect image URLs from selected media
+    const selectedMedia = media.filter(m => selectedIds.has(m.id));
+    const imageUrls = selectedMedia
+      .filter(m => m.mediaType === 'photo' && m.url)
+      .map(m => m.url);
+
+    if (imageUrls.length < 2) {
+      toast({ title: '至少需要 2 张照片才能生成视频', variant: 'destructive' });
+      setEditStep('template');
+      return;
+    }
+
+    try {
+      const url = await generateVideo({
+        imageUrls,
+        template: selectedTemplate,
+        onProgress: (pct) => setProgress(pct),
       });
-    }, 200);
+      setGeneratedVideoUrl(url);
+      setEditStep('done');
+    } catch (err) {
+      console.error('Video generation error:', err);
+      toast({ title: '视频生成失败', description: '请检查网络连接后重试', variant: 'destructive' });
+      setEditStep('template');
+    }
   };
 
   const resetEdit = () => {
