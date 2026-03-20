@@ -357,7 +357,7 @@ const MediaPage = () => {
                 ))}
               </div>
               <button
-                onClick={simulateProcessing}
+                onClick={startVideoGeneration}
                 className="w-full mt-4 h-12 rounded-xl bg-primary text-primary-foreground font-medium hover:opacity-90 transition-all"
               >
                 开始生成
