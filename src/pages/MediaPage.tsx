@@ -32,6 +32,8 @@ const MediaPage = () => {
   const [editStep, setEditStep] = useState<'select' | 'template' | 'processing' | 'done'>('select');
   const [selectedTemplate, setSelectedTemplate] = useState<string>('wabisabi');
   const [progress, setProgress] = useState(0);
+  const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+  const videoPreviewRef = useRef<HTMLVideoElement>(null);
   const [previewItem, setPreviewItem] = useState<MediaRecord | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
