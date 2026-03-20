@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MediaRecord, VIDEO_TEMPLATES } from '@/types';
 import {
   Camera, Video, Image, Film, Check, X, Play, Clock,
-  Wand2, ChevronRight, Plus, Calendar, Tag,
+  Wand2, ChevronRight, Plus, Calendar, Tag, CalendarDays,
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
