@@ -21,7 +21,8 @@ const getLocalDateStr = (date = new Date()) => {
 
 const MediaPage = () => {
   const { user } = useAuth();
-  const { records: media, loading: mediaLoading, addRecord } = useMediaRecords(user?.id);
+  const { records: media, loading: mediaLoading, addRecord, deleteRecord } = useMediaRecords(user?.id);
+  const [deleting, setDeleting] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('gallery');
   const [publishing, setPublishing] = useState(false);
   const [filter, setFilter] = useState<MediaFilter>('all');
