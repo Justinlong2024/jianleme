@@ -90,8 +90,9 @@ export const useCheckIn = (userId: string | undefined) => {
           }));
 
           const todayMeals = todayData?.meals as any;
+          const isMealFasting = (meal: any) => meal?.isFasting && (!meal?.foodItems || meal.foodItems.length === 0);
           const todayHasFasting = todayMeals
-            ? [todayMeals.breakfast?.isFasting, todayMeals.lunch?.isFasting, todayMeals.dinner?.isFasting].some(Boolean)
+            ? [isMealFasting(todayMeals.breakfast), isMealFasting(todayMeals.lunch), isMealFasting(todayMeals.dinner)].some(Boolean)
             : false;
 
           setStreakDays(calculateFastingStreak(historyRecords, todayHasFasting));
