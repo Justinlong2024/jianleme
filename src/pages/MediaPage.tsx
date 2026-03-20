@@ -36,6 +36,7 @@ const MediaPage = () => {
   const [composerFile, setComposerFile] = useState<File | null>(null);
   const [composerText, setComposerText] = useState('');
   const [composerMediaType, setComposerMediaType] = useState<'photo' | 'video'>('photo');
+  const [composerDate, setComposerDate] = useState(getLocalDateStr());
 
   const filtered = media.filter((m) =>
     filter === 'all' ? true : m.mediaType === filter
