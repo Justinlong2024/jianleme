@@ -20,6 +20,7 @@ import AuthPage from '@/pages/AuthPage';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useCheckIn } from '@/hooks/useCheckIn';
+import { useHealthRecords } from '@/hooks/useHealthRecords';
 import { HealthRecord } from '@/types';
 import { FoodAnalysisResult } from '@/services/foodAnalysis';
 import { toast } from '@/hooks/use-toast';
@@ -40,8 +41,9 @@ const Index = () => {
     handleAddMeditationRecord,
   } = useCheckIn(user?.id);
 
+  const { records: weightData, addRecord: handleAddHealthRecord, loading: healthLoading } = useHealthRecords(user?.id);
+
   const [activeTab, setActiveTab] = useState<TabType>('home');
-  const [weightData, setWeightData] = useState<HealthRecord[]>([]);
   const [showFoodAnalyzer, setShowFoodAnalyzer] = useState(false);
   const [analyzerMealType, setAnalyzerMealType] = useState<'breakfast' | 'lunch' | 'dinner'>('breakfast');
 
@@ -61,19 +63,6 @@ const Index = () => {
     });
   }, [handleAddFoodToMealForType, analyzerMealType]);
 
-  const handleAddHealthRecord = useCallback((record: Omit<HealthRecord, 'id'>) => {
-    const newRecord: HealthRecord = { ...record, id: `h-${Date.now()}` };
-    setWeightData((prev) => {
-      const todayDate = new Date().toISOString().split('T')[0];
-      const existing = prev.findIndex((r) => r.date === todayDate);
-      if (existing >= 0) {
-        const updated = [...prev];
-        updated[existing] = { ...updated[existing], ...newRecord };
-        return updated;
-      }
-      return [...prev, newRecord];
-    });
-  }, []);
 
   const meditationMinutes = checkIn.meditationRecords.reduce((s, r) => s + r.duration, 0);
 
@@ -87,7 +76,7 @@ const Index = () => {
     return [];
   }, []);
 
-  if (authLoading || subLoading || checkInLoading) {
+  if (authLoading || subLoading || checkInLoading || healthLoading) {
     return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">加载中...</div>;
   }
 

@@ -32,7 +32,10 @@ export const useCheckIn = (userId: string | undefined) => {
   const [loading, setLoading] = useState(true);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitialLoad = useRef(true);
+  const latestCheckInRef = useRef(checkIn);
 
+  // Keep ref in sync
+  useEffect(() => { latestCheckInRef.current = checkIn; }, [checkIn]);
   const today = getLocalDateStr();
 
   // Load today's check-in and history for streak
@@ -158,6 +161,32 @@ export const useCheckIn = (userId: string | undefined) => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
   }, [checkIn, userId, today, loading]);
+
+  // Flush pending save on page unload
+  useEffect(() => {
+    if (!userId) return;
+    const handleBeforeUnload = () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        const data = latestCheckInRef.current;
+        const body = JSON.stringify({
+          user_id: userId,
+          date: today,
+          meals: data.meals,
+          water_records: data.waterRecords,
+          meditation_records: data.meditationRecords,
+          total_water: data.totalWater,
+          total_calories: data.totalCalories,
+          fasting_hours: data.fastingHours,
+        });
+        // Use sendBeacon for reliable delivery on page close
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/daily_checkins?on_conflict=user_id,date`;
+        navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [userId, today]);
 
   // === Action handlers ===
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Activity, TrendingUp, Droplet, Heart, Lock } from 'lucide-react';
+import { X, Plus, Activity, TrendingUp, Droplet, Heart, Lock, CalendarDays } from 'lucide-react';
 import { HealthRecord } from '@/types';
 import { toast } from '@/hooks/use-toast';
 
@@ -8,6 +8,13 @@ interface HealthInputFormProps {
   onSave: (record: Omit<HealthRecord, 'id'>) => void;
   isPremium?: boolean;
 }
+
+const getLocalDateStr = (date = new Date()) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
 
 const fields = [
   { key: 'weight', label: '体重', unit: 'kg', icon: Activity, placeholder: '如 72.5', min: 20, max: 300, step: 0.1 },
@@ -17,14 +24,12 @@ const fields = [
   { key: 'bloodPressureDiastolic', label: '舒张压', unit: 'mmHg', icon: Heart, placeholder: '如 80', min: 30, max: 150, step: 1 },
 ] as const;
 
-type FieldKey = typeof fields[number]['key'];
-
 const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) => {
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
+  const [selectedDate, setSelectedDate] = useState(getLocalDateStr());
 
   const handleChange = (key: string, val: string) => {
-    // Only allow valid numeric input
     if (val !== '' && !/^\d*\.?\d*$/.test(val)) return;
     setValues((prev) => ({ ...prev, [key]: val }));
   };
@@ -36,7 +41,6 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
       return;
     }
 
-    // Validate ranges
     for (const field of fields) {
       const raw = values[field.key]?.trim();
       if (raw) {
@@ -53,7 +57,7 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
     }
 
     const record: Omit<HealthRecord, 'id'> = {
-      date: new Date().toISOString().split('T')[0],
+      date: selectedDate,
       ...(values.weight ? { weight: parseFloat(values.weight) } : {}),
       ...(values.bodyFat ? { bodyFat: parseFloat(values.bodyFat) } : {}),
       ...(values.bloodSugar ? { bloodSugar: parseFloat(values.bloodSugar) } : {}),
@@ -63,8 +67,14 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
 
     onSave(record);
     setValues({});
+    setSelectedDate(getLocalDateStr());
     setOpen(false);
-    toast({ title: '数据已记录 ✨', description: '健康数据已保存到今日记录' });
+
+    const isToday = selectedDate === getLocalDateStr();
+    toast({
+      title: '数据已记录 ✨',
+      description: isToday ? '健康数据已保存到今日记录' : `已保存 ${selectedDate} 的健康数据`,
+    });
   };
 
   return (
@@ -75,7 +85,7 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
         className="w-full wabi-card flex items-center justify-center gap-2 text-primary font-medium text-sm"
       >
         <Plus size={18} />
-        记录今日健康数据
+        记录健康数据
       </motion.button>
 
       <AnimatePresence>
@@ -95,7 +105,6 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
               className="w-full max-w-lg bg-card rounded-t-3xl sm:rounded-3xl mb-[calc(env(safe-area-inset-bottom,0px)+5rem)] sm:mb-0 max-h-[calc(100dvh-6rem-env(safe-area-inset-bottom,0px))] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
               <div className="flex items-center justify-between p-5 border-b border-border">
                 <h2 className="font-bold text-foreground">记录健康数据</h2>
                 <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
@@ -104,6 +113,21 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
               </div>
 
               <div className="p-5 space-y-4 overflow-y-auto flex-1">
+                {/* Date picker */}
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <CalendarDays size={16} className="text-primary" />
+                  </div>
+                  <label className="text-sm text-foreground w-16 shrink-0">日期</label>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    max={getLocalDateStr()}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="flex-1 h-10 rounded-xl bg-muted px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                  />
+                </div>
+
                 {fields.map((field) => {
                   const Icon = field.icon;
                   const isLocked = !isPremium && (field.key === 'bloodSugar' || field.key === 'bloodPressureSystolic' || field.key === 'bloodPressureDiastolic');
@@ -139,13 +163,11 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
                   );
                 })}
 
-                {/* Blood pressure hint */}
                 <p className="text-[10px] text-muted-foreground px-1">
                   血压请分别填写收缩压（高压）和舒张压（低压）
                 </p>
               </div>
 
-              {/* Sticky bottom actions */}
               <div className="sticky bottom-0 bg-card p-5 pt-3 border-t border-border flex gap-3">
                 <button
                   onClick={() => setOpen(false)}
