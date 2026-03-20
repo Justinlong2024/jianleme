@@ -25,11 +25,17 @@ const DataPage = forwardRef<HTMLDivElement, DataPageProps>(({ weightData, onAddH
     ? `${latest.bloodPressureSystolic}/${latest.bloodPressureDiastolic}`
     : '--/--';
 
+  const waistChange = latest?.waistCircumference && first?.waistCircumference
+    ? (latest.waistCircumference - first.waistCircumference).toFixed(1)
+    : null;
+
   const healthMetrics = [
     { label: '体重', value: latest?.weight ? `${latest.weight} kg` : '--', icon: Activity, change: weightChange ? `${parseFloat(weightChange) <= 0 ? '' : '+'}${weightChange}kg` : '暂无', positive: weightChange ? parseFloat(weightChange) <= 0 : true },
     { label: '体脂率', value: latest?.bodyFat ? `${latest.bodyFat}%` : '--', icon: TrendingUp, change: fatChange ? `${parseFloat(fatChange) <= 0 ? '' : '+'}${fatChange}%` : '暂无', positive: fatChange ? parseFloat(fatChange) <= 0 : true },
+    { label: '腰围', value: latest?.waistCircumference ? `${latest.waistCircumference} cm` : '--', icon: Ruler, change: waistChange ? `${parseFloat(waistChange) <= 0 ? '' : '+'}${waistChange}cm` : '暂无', positive: waistChange ? parseFloat(waistChange) <= 0 : true },
     { label: '空腹血糖', value: latest?.bloodSugar ? `${latest.bloodSugar} mmol/L` : '--', icon: Droplet, change: latest?.bloodSugar ? (latest.bloodSugar <= 6.1 ? '正常' : '偏高') : '暂无', positive: latest?.bloodSugar ? latest.bloodSugar <= 6.1 : true },
-    { label: '血压', value: bp, icon: Heart, change: latest?.bloodPressureSystolic ? (latest.bloodPressureSystolic <= 140 ? '正常' : '偏高') : '暂无', positive: latest?.bloodPressureSystolic ? latest.bloodPressureSystolic <= 140 : true },
+    { label: '高压', value: latest?.bloodPressureSystolic ? `${latest.bloodPressureSystolic} mmHg` : '--', icon: Heart, change: latest?.bloodPressureSystolic ? (latest.bloodPressureSystolic <= 140 ? '正常' : '偏高') : '暂无', positive: latest?.bloodPressureSystolic ? latest.bloodPressureSystolic <= 140 : true },
+    { label: '低压', value: latest?.bloodPressureDiastolic ? `${latest.bloodPressureDiastolic} mmHg` : '--', icon: Heart, change: latest?.bloodPressureDiastolic ? (latest.bloodPressureDiastolic <= 90 ? '正常' : '偏高') : '暂无', positive: latest?.bloodPressureDiastolic ? latest.bloodPressureDiastolic <= 90 : true },
   ];
 
   return (

@@ -15,6 +15,7 @@ export function generateMockWeightData(): HealthRecord[] {
       date: date.toISOString().split('T')[0],
       weight: parseFloat(weight.toFixed(1)),
       bodyFat: parseFloat((weight * 0.25 - Math.random() * 2).toFixed(1)),
+      waistCircumference: parseFloat((85 - i * 0.1 + Math.random() * 1).toFixed(1)),
       bloodSugar: parseFloat((4.5 + Math.random() * 1.5).toFixed(1)),
       bloodPressureSystolic: Math.round(115 + Math.random() * 15),
       bloodPressureDiastolic: Math.round(70 + Math.random() * 15),

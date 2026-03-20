@@ -166,7 +166,7 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
                 })}
 
                 <p className="text-[10px] text-muted-foreground px-1">
-                  血压请分别填写收缩压（高压）和舒张压（低压）
+                  血压请分别填写高压（收缩压）和低压（舒张压）
                 </p>
               </div>
 

@@ -41,6 +41,7 @@ export interface HealthRecord {
   date: string;
   weight?: number;
   bodyFat?: number;
+  waistCircumference?: number;
   bloodSugar?: number;
   bloodPressureSystolic?: number;
   bloodPressureDiastolic?: number;

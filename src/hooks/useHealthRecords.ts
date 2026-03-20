@@ -75,10 +75,11 @@ export const useHealthRecords = (userId: string | undefined) => {
           date,
           weight: record.weight ?? null,
           body_fat: record.bodyFat ?? null,
+          waist_circumference: record.waistCircumference ?? null,
           blood_sugar: record.bloodSugar ?? null,
           blood_pressure_systolic: record.bloodPressureSystolic ?? null,
           blood_pressure_diastolic: record.bloodPressureDiastolic ?? null,
-        }, { onConflict: 'user_id,date' });
+        } as any, { onConflict: 'user_id,date' });
 
       if (error) {
         console.error('Failed to save health record:', error);
