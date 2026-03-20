@@ -182,6 +182,7 @@ const MediaPage = () => {
             setComposerPreview(URL.createObjectURL(file));
             setComposerMediaType('video');
             setComposerText('');
+            setComposerDate(getLocalDateStr());
             setShowComposer(true);
             e.target.value = '';
           }} />
