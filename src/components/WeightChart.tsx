@@ -16,10 +16,12 @@ interface WeightChartProps {
   data: HealthRecord[];
 }
 
-type ChartTab = 'weight' | 'bloodSugar' | 'bloodPressure';
+type ChartTab = 'weight' | 'bodyFat' | 'waist' | 'bloodSugar' | 'bloodPressure';
 
 const tabs: { key: ChartTab; label: string; icon: typeof Scale }[] = [
   { key: 'weight', label: '体重', icon: Scale },
+  { key: 'bodyFat', label: '体脂', icon: TrendingDown },
+  { key: 'waist', label: '腰围', icon: Ruler },
   { key: 'bloodSugar', label: '血糖', icon: Droplet },
   { key: 'bloodPressure', label: '血压', icon: Heart },
 ];
