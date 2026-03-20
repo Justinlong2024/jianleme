@@ -162,6 +162,32 @@ export const useCheckIn = (userId: string | undefined) => {
     };
   }, [checkIn, userId, today, loading]);
 
+  // Flush pending save on page unload
+  useEffect(() => {
+    if (!userId) return;
+    const handleBeforeUnload = () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        const data = latestCheckInRef.current;
+        const body = JSON.stringify({
+          user_id: userId,
+          date: today,
+          meals: data.meals,
+          water_records: data.waterRecords,
+          meditation_records: data.meditationRecords,
+          total_water: data.totalWater,
+          total_calories: data.totalCalories,
+          fasting_hours: data.fastingHours,
+        });
+        // Use sendBeacon for reliable delivery on page close
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/daily_checkins?on_conflict=user_id,date`;
+        navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [userId, today]);
+
   // === Action handlers ===
 
   const handleToggleFasting = useCallback((mealType: string) => {
