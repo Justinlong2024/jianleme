@@ -3,9 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MediaRecord, VIDEO_TEMPLATES } from '@/types';
 import {
   Camera, Video, Image, Film, Check, X, Play, Clock,
-  Wand2, ChevronRight, Plus, Calendar, Tag, CalendarDays,
+  Wand2, ChevronRight, Plus, Calendar, Tag, CalendarDays, Loader2,
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useMediaRecords } from '@/hooks/useMediaRecords';
+import { useAuth } from '@/hooks/useAuth';
 
 type ViewMode = 'gallery' | 'capture' | 'edit';
 type MediaFilter = 'all' | 'photo' | 'video';
