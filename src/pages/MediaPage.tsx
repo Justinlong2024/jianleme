@@ -21,7 +21,8 @@ const getLocalDateStr = (date = new Date()) => {
 
 const MediaPage = () => {
   const { user } = useAuth();
-  const { records: media, loading: mediaLoading, addRecord } = useMediaRecords(user?.id);
+  const { records: media, loading: mediaLoading, addRecord, deleteRecord } = useMediaRecords(user?.id);
+  const [deleting, setDeleting] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('gallery');
   const [publishing, setPublishing] = useState(false);
   const [filter, setFilter] = useState<MediaFilter>('all');
@@ -469,12 +470,31 @@ const MediaPage = () => {
                     体重：{previewItem.relatedData.weight.toFixed(1)} kg
                   </p>
                 )}
-                <button
-                  onClick={() => setPreviewItem(null)}
-                  className="w-full mt-3 h-10 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
-                >
-                  关闭
-                </button>
+                <div className="flex gap-2 mt-3">
+                  <button
+                    disabled={deleting}
+                    onClick={async () => {
+                      setDeleting(true);
+                      const ok = await deleteRecord(previewItem.id, previewItem.url);
+                      setDeleting(false);
+                      if (ok) {
+                        setPreviewItem(null);
+                        toast({ title: '已删除 🗑️' });
+                      } else {
+                        toast({ title: '删除失败', variant: 'destructive' });
+                      }
+                    }}
+                    className="flex-1 h-10 rounded-xl bg-destructive/10 text-destructive text-sm font-medium hover:bg-destructive/20 transition-all disabled:opacity-50"
+                  >
+                    {deleting ? <Loader2 size={14} className="animate-spin mx-auto" /> : '删除'}
+                  </button>
+                  <button
+                    onClick={() => setPreviewItem(null)}
+                    className="flex-1 h-10 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
+                  >
+                    关闭
+                  </button>
+                </div>
               </div>
             </motion.div>
           </motion.div>

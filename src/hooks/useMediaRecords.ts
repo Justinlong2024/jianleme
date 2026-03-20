@@ -113,5 +113,35 @@ export const useMediaRecords = (userId: string | undefined) => {
     return newRecord;
   }, [userId, uploadFile]);
 
-  return { records, loading, addRecord };
+  const deleteRecord = useCallback(async (id: string, fileUrl?: string): Promise<boolean> => {
+    if (!userId) return false;
+
+    // Delete from DB
+    const { error } = await supabase
+      .from('media_records')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Delete media record error:', error);
+      return false;
+    }
+
+    // Try to delete file from storage
+    if (fileUrl) {
+      try {
+        const url = new URL(fileUrl);
+        const pathMatch = url.pathname.match(/\/object\/public\/user-media\/(.+)/);
+        if (pathMatch) {
+          await supabase.storage.from('user-media').remove([pathMatch[1]]);
+        }
+      } catch { /* ignore storage cleanup errors */ }
+    }
+
+    setRecords(prev => prev.filter(r => r.id !== id));
+    return true;
+  }, [userId]);
+
+  return { records, loading, addRecord, deleteRecord };
 };
