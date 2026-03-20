@@ -49,10 +49,13 @@ export function calculateFastingStreak(
     const record = sorted.find(r => r.date === dateStr);
     if (!record) break; // No record for this day = streak broken
 
+    const isMealFasting = (meal?: { isFasting?: boolean; foodItems?: any[] }) =>
+      meal?.isFasting && (!meal.foodItems || meal.foodItems.length === 0);
+
     const hasFasting = [
-      record.meals?.breakfast?.isFasting,
-      record.meals?.lunch?.isFasting,
-      record.meals?.dinner?.isFasting,
+      isMealFasting(record.meals?.breakfast as any),
+      isMealFasting(record.meals?.lunch as any),
+      isMealFasting(record.meals?.dinner as any),
     ].some(Boolean);
 
     if (hasFasting) {
