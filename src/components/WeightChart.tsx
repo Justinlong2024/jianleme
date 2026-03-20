@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { HealthRecord } from '@/types';
-import { TrendingDown, TrendingUp, Scale, Droplet, Heart } from 'lucide-react';
+import { TrendingDown, TrendingUp, Scale, Droplet, Heart, Ruler } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
   LineChart,
@@ -16,10 +16,12 @@ interface WeightChartProps {
   data: HealthRecord[];
 }
 
-type ChartTab = 'weight' | 'bloodSugar' | 'bloodPressure';
+type ChartTab = 'weight' | 'bodyFat' | 'waist' | 'bloodSugar' | 'bloodPressure';
 
 const tabs: { key: ChartTab; label: string; icon: typeof Scale }[] = [
   { key: 'weight', label: '体重', icon: Scale },
+  { key: 'bodyFat', label: '体脂', icon: TrendingDown },
+  { key: 'waist', label: '腰围', icon: Ruler },
   { key: 'bloodSugar', label: '血糖', icon: Droplet },
   { key: 'bloodPressure', label: '血压', icon: Heart },
 ];
@@ -35,9 +37,10 @@ const WeightChart = ({ data }: WeightChartProps) => {
     date: d.date.slice(5),
     体重: d.weight,
     体脂率: d.bodyFat,
+    腰围: d.waistCircumference,
     血糖: d.bloodSugar,
-    收缩压: d.bloodPressureSystolic,
-    舒张压: d.bloodPressureDiastolic,
+    高压: d.bloodPressureSystolic,
+    低压: d.bloodPressureDiastolic,
   }));
 
   const renderSummary = () => {
@@ -55,12 +58,42 @@ const WeightChart = ({ data }: WeightChartProps) => {
               <div className="text-3xl font-bold text-foreground font-serif">{latest?.weight ?? '--'}</div>
               <div className="text-xs text-muted-foreground">kg · 当前</div>
             </div>
-            {latest?.bodyFat && (
-              <div>
-                <div className="text-lg font-semibold text-muted-foreground">{latest.bodyFat}%</div>
-                <div className="text-xs text-muted-foreground">体脂率</div>
-              </div>
-            )}
+          </div>
+        </>
+      );
+    }
+    if (activeTab === 'bodyFat') {
+      const change = latest?.bodyFat && first?.bodyFat ? (latest.bodyFat - first.bodyFat).toFixed(1) : '0';
+      const isDown = parseFloat(change) <= 0;
+      return (
+        <>
+          <div className="flex items-center gap-1 text-sm">
+            {isDown ? <TrendingDown size={14} className="text-success" /> : <TrendingUp size={14} className="text-destructive" />}
+            <span className={`font-medium ${isDown ? 'text-success' : 'text-destructive'}`}>{change}%</span>
+          </div>
+          <div className="flex items-end gap-4 mb-4">
+            <div>
+              <div className="text-3xl font-bold text-foreground font-serif">{latest?.bodyFat ?? '--'}</div>
+              <div className="text-xs text-muted-foreground">% · 当前</div>
+            </div>
+          </div>
+        </>
+      );
+    }
+    if (activeTab === 'waist') {
+      const change = latest?.waistCircumference && first?.waistCircumference ? (latest.waistCircumference - first.waistCircumference).toFixed(1) : '0';
+      const isDown = parseFloat(change) <= 0;
+      return (
+        <>
+          <div className="flex items-center gap-1 text-sm">
+            {isDown ? <TrendingDown size={14} className="text-success" /> : <TrendingUp size={14} className="text-destructive" />}
+            <span className={`font-medium ${isDown ? 'text-success' : 'text-destructive'}`}>{change} cm</span>
+          </div>
+          <div className="flex items-end gap-4 mb-4">
+            <div>
+              <div className="text-3xl font-bold text-foreground font-serif">{latest?.waistCircumference ?? '--'}</div>
+              <div className="text-xs text-muted-foreground">cm · 当前</div>
+            </div>
           </div>
         </>
       );
@@ -103,22 +136,21 @@ const WeightChart = ({ data }: WeightChartProps) => {
 
   const renderLines = () => {
     if (activeTab === 'weight') {
-      return (
-        <>
-          <Line type="monotone" dataKey="体重" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />
-          <Line type="monotone" dataKey="体脂率" stroke="hsl(var(--muted-foreground))" strokeWidth={1.5} dot={false} strokeDasharray="4 4" />
-        </>
-      );
+      return <Line type="monotone" dataKey="体重" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />;
+    }
+    if (activeTab === 'bodyFat') {
+      return <Line type="monotone" dataKey="体脂率" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />;
+    }
+    if (activeTab === 'waist') {
+      return <Line type="monotone" dataKey="腰围" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />;
     }
     if (activeTab === 'bloodSugar') {
-      return (
-        <Line type="monotone" dataKey="血糖" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />
-      );
+      return <Line type="monotone" dataKey="血糖" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />;
     }
     return (
       <>
-        <Line type="monotone" dataKey="收缩压" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />
-        <Line type="monotone" dataKey="舒张压" stroke="hsl(var(--muted-foreground))" strokeWidth={1.5} dot={false} strokeDasharray="4 4" />
+        <Line type="monotone" dataKey="高压" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />
+        <Line type="monotone" dataKey="低压" stroke="hsl(var(--muted-foreground))" strokeWidth={1.5} dot={false} strokeDasharray="4 4" />
       </>
     );
   };
@@ -155,7 +187,7 @@ const WeightChart = ({ data }: WeightChartProps) => {
       {/* Summary */}
       <div className="flex items-center justify-between mb-2">
         <span className="font-semibold text-foreground">
-          {activeTab === 'weight' ? '体重趋势' : activeTab === 'bloodSugar' ? '血糖趋势' : '血压趋势'}
+          {activeTab === 'weight' ? '体重趋势' : activeTab === 'bodyFat' ? '体脂趋势' : activeTab === 'waist' ? '腰围趋势' : activeTab === 'bloodSugar' ? '血糖趋势' : '血压趋势'}
         </span>
         {renderSummary()}
       </div>
