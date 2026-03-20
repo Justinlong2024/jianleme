@@ -101,6 +101,45 @@ export type Database = {
         }
         Relationships: []
       }
+      health_records: {
+        Row: {
+          blood_pressure_diastolic: number | null
+          blood_pressure_systolic: number | null
+          blood_sugar: number | null
+          body_fat: number | null
+          created_at: string
+          date: string
+          id: string
+          updated_at: string
+          user_id: string
+          weight: number | null
+        }
+        Insert: {
+          blood_pressure_diastolic?: number | null
+          blood_pressure_systolic?: number | null
+          blood_sugar?: number | null
+          body_fat?: number | null
+          created_at?: string
+          date: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          weight?: number | null
+        }
+        Update: {
+          blood_pressure_diastolic?: number | null
+          blood_pressure_systolic?: number | null
+          blood_sugar?: number | null
+          body_fat?: number | null
+          created_at?: string
+          date?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          weight?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
