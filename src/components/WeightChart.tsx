@@ -37,9 +37,10 @@ const WeightChart = ({ data }: WeightChartProps) => {
     date: d.date.slice(5),
     体重: d.weight,
     体脂率: d.bodyFat,
+    腰围: d.waistCircumference,
     血糖: d.bloodSugar,
-    收缩压: d.bloodPressureSystolic,
-    舒张压: d.bloodPressureDiastolic,
+    高压: d.bloodPressureSystolic,
+    低压: d.bloodPressureDiastolic,
   }));
 
   const renderSummary = () => {
