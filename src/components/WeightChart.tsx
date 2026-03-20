@@ -58,12 +58,42 @@ const WeightChart = ({ data }: WeightChartProps) => {
               <div className="text-3xl font-bold text-foreground font-serif">{latest?.weight ?? '--'}</div>
               <div className="text-xs text-muted-foreground">kg · 当前</div>
             </div>
-            {latest?.bodyFat && (
-              <div>
-                <div className="text-lg font-semibold text-muted-foreground">{latest.bodyFat}%</div>
-                <div className="text-xs text-muted-foreground">体脂率</div>
-              </div>
-            )}
+          </div>
+        </>
+      );
+    }
+    if (activeTab === 'bodyFat') {
+      const change = latest?.bodyFat && first?.bodyFat ? (latest.bodyFat - first.bodyFat).toFixed(1) : '0';
+      const isDown = parseFloat(change) <= 0;
+      return (
+        <>
+          <div className="flex items-center gap-1 text-sm">
+            {isDown ? <TrendingDown size={14} className="text-success" /> : <TrendingUp size={14} className="text-destructive" />}
+            <span className={`font-medium ${isDown ? 'text-success' : 'text-destructive'}`}>{change}%</span>
+          </div>
+          <div className="flex items-end gap-4 mb-4">
+            <div>
+              <div className="text-3xl font-bold text-foreground font-serif">{latest?.bodyFat ?? '--'}</div>
+              <div className="text-xs text-muted-foreground">% · 当前</div>
+            </div>
+          </div>
+        </>
+      );
+    }
+    if (activeTab === 'waist') {
+      const change = latest?.waistCircumference && first?.waistCircumference ? (latest.waistCircumference - first.waistCircumference).toFixed(1) : '0';
+      const isDown = parseFloat(change) <= 0;
+      return (
+        <>
+          <div className="flex items-center gap-1 text-sm">
+            {isDown ? <TrendingDown size={14} className="text-success" /> : <TrendingUp size={14} className="text-destructive" />}
+            <span className={`font-medium ${isDown ? 'text-success' : 'text-destructive'}`}>{change} cm</span>
+          </div>
+          <div className="flex items-end gap-4 mb-4">
+            <div>
+              <div className="text-3xl font-bold text-foreground font-serif">{latest?.waistCircumference ?? '--'}</div>
+              <div className="text-xs text-muted-foreground">cm · 当前</div>
+            </div>
           </div>
         </>
       );
