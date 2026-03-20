@@ -171,6 +171,7 @@ const MediaPage = () => {
             setComposerPreview(URL.createObjectURL(file));
             setComposerMediaType('photo');
             setComposerText('');
+            setComposerDate(getLocalDateStr());
             setShowComposer(true);
             e.target.value = '';
           }} />
