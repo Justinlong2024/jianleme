@@ -3,12 +3,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MediaRecord, VIDEO_TEMPLATES } from '@/types';
 import {
   Camera, Video, Image, Film, Check, X, Play, Clock,
-  Wand2, ChevronRight, Plus, Calendar, Tag,
+  Wand2, ChevronRight, Plus, Calendar, Tag, CalendarDays,
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 type ViewMode = 'gallery' | 'capture' | 'edit';
 type MediaFilter = 'all' | 'photo' | 'video';
+
+const getLocalDateStr = (date = new Date()) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
 
 const MediaPage = () => {
   const [media, setMedia] = useState<MediaRecord[]>([]);
@@ -29,6 +36,7 @@ const MediaPage = () => {
   const [composerFile, setComposerFile] = useState<File | null>(null);
   const [composerText, setComposerText] = useState('');
   const [composerMediaType, setComposerMediaType] = useState<'photo' | 'video'>('photo');
+  const [composerDate, setComposerDate] = useState(getLocalDateStr());
 
   const filtered = media.filter((m) =>
     filter === 'all' ? true : m.mediaType === filter
@@ -163,6 +171,7 @@ const MediaPage = () => {
             setComposerPreview(URL.createObjectURL(file));
             setComposerMediaType('photo');
             setComposerText('');
+            setComposerDate(getLocalDateStr());
             setShowComposer(true);
             e.target.value = '';
           }} />
@@ -173,6 +182,7 @@ const MediaPage = () => {
             setComposerPreview(URL.createObjectURL(file));
             setComposerMediaType('video');
             setComposerText('');
+            setComposerDate(getLocalDateStr());
             setShowComposer(true);
             e.target.value = '';
           }} />
@@ -508,6 +518,21 @@ const MediaPage = () => {
                   </div>
                 )}
 
+                {/* Date picker */}
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <CalendarDays size={16} className="text-primary" />
+                  </div>
+                  <label className="text-sm text-foreground w-16 shrink-0">日期</label>
+                  <input
+                    type="date"
+                    value={composerDate}
+                    max={getLocalDateStr()}
+                    onChange={(e) => setComposerDate(e.target.value)}
+                    className="flex-1 h-10 rounded-xl bg-muted px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                  />
+                </div>
+
                 {/* Text input */}
                 <textarea
                   value={composerText}
@@ -516,7 +541,7 @@ const MediaPage = () => {
                   className="w-full h-24 rounded-xl bg-muted px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"
                 />
                 <div className="flex justify-between items-center px-1">
-                  <p className="text-[10px] text-muted-foreground">记录你的感受、进步或今天的小目标</p>
+                  <p className="text-[10px] text-muted-foreground">支持补录历史照片和视频</p>
                   <span className="text-[10px] text-muted-foreground">{composerText.length}/500</span>
                 </div>
               </div>
@@ -531,12 +556,12 @@ const MediaPage = () => {
                 </button>
                 <button
                   onClick={() => {
-                    const today = new Date();
-                    const dateStr = today.toISOString().split('T')[0];
+                    const dateStr = composerDate || getLocalDateStr();
+                    const dateObj = new Date(dateStr + 'T12:00:00');
                     const newRecord: MediaRecord = {
                       id: `m-${Date.now()}`,
                       mediaType: composerMediaType,
-                      timestamp: today.toISOString(),
+                      timestamp: dateObj.toISOString(),
                       date: dateStr,
                       url: composerPreview || '',
                       thumbnailUrl: composerPreview || '',
@@ -544,14 +569,16 @@ const MediaPage = () => {
                       notes: composerText.trim() || undefined,
                       relatedData: { dayNumber: 1 },
                     };
-                    setMedia((prev) => [newRecord, ...prev]);
+                    setMedia((prev) => [newRecord, ...prev].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
                     setShowComposer(false);
                     setComposerPreview(null);
                     setComposerFile(null);
                     setComposerText('');
+                    setComposerDate(getLocalDateStr());
+                    const isToday = dateStr === getLocalDateStr();
                     toast({
                       title: '发布成功 ✨',
-                      description: composerText.trim() ? '照片和文字已记录' : '照片已记录',
+                      description: isToday ? '已记录到今日' : `已记录到 ${dateStr}`,
                     });
                   }}
                   className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all"
