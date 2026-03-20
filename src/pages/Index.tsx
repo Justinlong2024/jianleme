@@ -63,19 +63,6 @@ const Index = () => {
     });
   }, [handleAddFoodToMealForType, analyzerMealType]);
 
-  const handleAddHealthRecord = useCallback((record: Omit<HealthRecord, 'id'>) => {
-    const newRecord: HealthRecord = { ...record, id: `h-${Date.now()}` };
-    setWeightData((prev) => {
-      const todayDate = new Date().toISOString().split('T')[0];
-      const existing = prev.findIndex((r) => r.date === todayDate);
-      if (existing >= 0) {
-        const updated = [...prev];
-        updated[existing] = { ...updated[existing], ...newRecord };
-        return updated;
-      }
-      return [...prev, newRecord];
-    });
-  }, []);
 
   const meditationMinutes = checkIn.meditationRecords.reduce((s, r) => s + r.duration, 0);
 
