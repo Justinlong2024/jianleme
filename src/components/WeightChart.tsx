@@ -136,22 +136,21 @@ const WeightChart = ({ data }: WeightChartProps) => {
 
   const renderLines = () => {
     if (activeTab === 'weight') {
-      return (
-        <>
-          <Line type="monotone" dataKey="体重" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />
-          <Line type="monotone" dataKey="体脂率" stroke="hsl(var(--muted-foreground))" strokeWidth={1.5} dot={false} strokeDasharray="4 4" />
-        </>
-      );
+      return <Line type="monotone" dataKey="体重" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />;
+    }
+    if (activeTab === 'bodyFat') {
+      return <Line type="monotone" dataKey="体脂率" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />;
+    }
+    if (activeTab === 'waist') {
+      return <Line type="monotone" dataKey="腰围" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />;
     }
     if (activeTab === 'bloodSugar') {
-      return (
-        <Line type="monotone" dataKey="血糖" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />
-      );
+      return <Line type="monotone" dataKey="血糖" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />;
     }
     return (
       <>
-        <Line type="monotone" dataKey="收缩压" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />
-        <Line type="monotone" dataKey="舒张压" stroke="hsl(var(--muted-foreground))" strokeWidth={1.5} dot={false} strokeDasharray="4 4" />
+        <Line type="monotone" dataKey="高压" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'hsl(var(--primary))' }} />
+        <Line type="monotone" dataKey="低压" stroke="hsl(var(--muted-foreground))" strokeWidth={1.5} dot={false} strokeDasharray="4 4" />
       </>
     );
   };
