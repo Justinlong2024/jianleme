@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { HealthRecord } from '@/types';
-import { TrendingDown, TrendingUp, Scale, Droplet, Heart } from 'lucide-react';
+import { TrendingDown, TrendingUp, Scale, Droplet, Heart, Ruler } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
   LineChart,
