@@ -556,12 +556,12 @@ const MediaPage = () => {
                 </button>
                 <button
                   onClick={() => {
-                    const today = new Date();
-                    const dateStr = today.toISOString().split('T')[0];
+                    const dateStr = composerDate || getLocalDateStr();
+                    const dateObj = new Date(dateStr + 'T12:00:00');
                     const newRecord: MediaRecord = {
                       id: `m-${Date.now()}`,
                       mediaType: composerMediaType,
-                      timestamp: today.toISOString(),
+                      timestamp: dateObj.toISOString(),
                       date: dateStr,
                       url: composerPreview || '',
                       thumbnailUrl: composerPreview || '',
@@ -569,14 +569,16 @@ const MediaPage = () => {
                       notes: composerText.trim() || undefined,
                       relatedData: { dayNumber: 1 },
                     };
-                    setMedia((prev) => [newRecord, ...prev]);
+                    setMedia((prev) => [newRecord, ...prev].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
                     setShowComposer(false);
                     setComposerPreview(null);
                     setComposerFile(null);
                     setComposerText('');
+                    setComposerDate(getLocalDateStr());
+                    const isToday = dateStr === getLocalDateStr();
                     toast({
                       title: '发布成功 ✨',
-                      description: composerText.trim() ? '照片和文字已记录' : '照片已记录',
+                      description: isToday ? '已记录到今日' : `已记录到 ${dateStr}`,
                     });
                   }}
                   className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-all"
