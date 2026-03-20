@@ -19,9 +19,10 @@ const getLocalDateStr = (date = new Date()) => {
 const fields = [
   { key: 'weight', label: '体重', unit: 'kg', icon: Activity, placeholder: '如 72.5', min: 20, max: 300, step: 0.1 },
   { key: 'bodyFat', label: '体脂率', unit: '%', icon: TrendingUp, placeholder: '如 18.5', min: 1, max: 60, step: 0.1 },
+  { key: 'waistCircumference', label: '腰围', unit: 'cm', icon: Activity, placeholder: '如 80.0', min: 30, max: 200, step: 0.1 },
   { key: 'bloodSugar', label: '空腹血糖', unit: 'mmol/L', icon: Droplet, placeholder: '如 5.2', min: 1, max: 30, step: 0.1 },
-  { key: 'bloodPressureSystolic', label: '收缩压', unit: 'mmHg', icon: Heart, placeholder: '如 120', min: 50, max: 250, step: 1 },
-  { key: 'bloodPressureDiastolic', label: '舒张压', unit: 'mmHg', icon: Heart, placeholder: '如 80', min: 30, max: 150, step: 1 },
+  { key: 'bloodPressureSystolic', label: '高压', unit: 'mmHg', icon: Heart, placeholder: '如 120', min: 50, max: 250, step: 1 },
+  { key: 'bloodPressureDiastolic', label: '低压', unit: 'mmHg', icon: Heart, placeholder: '如 80', min: 30, max: 150, step: 1 },
 ] as const;
 
 const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) => {
@@ -60,6 +61,7 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
       date: selectedDate,
       ...(values.weight ? { weight: parseFloat(values.weight) } : {}),
       ...(values.bodyFat ? { bodyFat: parseFloat(values.bodyFat) } : {}),
+      ...(values.waistCircumference ? { waistCircumference: parseFloat(values.waistCircumference) } : {}),
       ...(values.bloodSugar ? { bloodSugar: parseFloat(values.bloodSugar) } : {}),
       ...(values.bloodPressureSystolic ? { bloodPressureSystolic: parseFloat(values.bloodPressureSystolic) } : {}),
       ...(values.bloodPressureDiastolic ? { bloodPressureDiastolic: parseFloat(values.bloodPressureDiastolic) } : {}),
@@ -164,7 +166,7 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
                 })}
 
                 <p className="text-[10px] text-muted-foreground px-1">
-                  血压请分别填写收缩压（高压）和舒张压（低压）
+                  血压请分别填写高压（收缩压）和低压（舒张压）
                 </p>
               </div>
 
