@@ -21,9 +21,7 @@ const DataPage = forwardRef<HTMLDivElement, DataPageProps>(({ weightData, onAddH
     ? (latest.bodyFat - first.bodyFat).toFixed(1)
     : null;
 
-  const bp = latest?.bloodPressureSystolic && latest?.bloodPressureDiastolic
-    ? `${latest.bloodPressureSystolic}/${latest.bloodPressureDiastolic}`
-    : '--/--';
+  // bp split into separate high/low metrics below
 
   const waistChange = latest?.waistCircumference && first?.waistCircumference
     ? (latest.waistCircumference - first.waistCircumference).toFixed(1)
