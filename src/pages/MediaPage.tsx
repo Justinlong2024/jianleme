@@ -20,8 +20,9 @@ const getLocalDateStr = (date = new Date()) => {
 };
 
 const MediaPage = () => {
-  const [media, setMedia] = useState<MediaRecord[]>([]);
-  const [viewMode, setViewMode] = useState<ViewMode>('gallery');
+  const { user } = useAuth();
+  const { records: media, loading: mediaLoading, addRecord } = useMediaRecords(user?.id);
+  const [publishing, setPublishing] = useState(false);
   const [filter, setFilter] = useState<MediaFilter>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSelecting, setIsSelecting] = useState(false);
