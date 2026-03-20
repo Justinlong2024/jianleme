@@ -41,8 +41,9 @@ const Index = () => {
     handleAddMeditationRecord,
   } = useCheckIn(user?.id);
 
+  const { records: weightData, addRecord: handleAddHealthRecord, loading: healthLoading } = useHealthRecords(user?.id);
+
   const [activeTab, setActiveTab] = useState<TabType>('home');
-  const [weightData, setWeightData] = useState<HealthRecord[]>([]);
   const [showFoodAnalyzer, setShowFoodAnalyzer] = useState(false);
   const [analyzerMealType, setAnalyzerMealType] = useState<'breakfast' | 'lunch' | 'dinner'>('breakfast');
 
