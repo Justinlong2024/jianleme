@@ -32,6 +32,7 @@ export const useHealthRecords = (userId: string | undefined) => {
             date: r.date,
             weight: r.weight ? Number(r.weight) : undefined,
             bodyFat: r.body_fat ? Number(r.body_fat) : undefined,
+            waistCircumference: (r as any).waist_circumference ? Number((r as any).waist_circumference) : undefined,
             bloodSugar: r.blood_sugar ? Number(r.blood_sugar) : undefined,
             bloodPressureSystolic: r.blood_pressure_systolic ?? undefined,
             bloodPressureDiastolic: r.blood_pressure_diastolic ?? undefined,
