@@ -3,7 +3,7 @@ import { HealthRecord } from '@/types';
 import WeightChart from '@/components/WeightChart';
 import HealthInputForm from '@/components/HealthInputForm';
 import { motion } from 'framer-motion';
-import { Activity, Heart, Droplet, TrendingUp } from 'lucide-react';
+import { Activity, Heart, Droplet, TrendingUp, Ruler } from 'lucide-react';
 
 interface DataPageProps {
   weightData: HealthRecord[];
