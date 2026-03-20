@@ -518,6 +518,21 @@ const MediaPage = () => {
                   </div>
                 )}
 
+                {/* Date picker */}
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <CalendarDays size={16} className="text-primary" />
+                  </div>
+                  <label className="text-sm text-foreground w-16 shrink-0">日期</label>
+                  <input
+                    type="date"
+                    value={composerDate}
+                    max={getLocalDateStr()}
+                    onChange={(e) => setComposerDate(e.target.value)}
+                    className="flex-1 h-10 rounded-xl bg-muted px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                  />
+                </div>
+
                 {/* Text input */}
                 <textarea
                   value={composerText}
@@ -526,7 +541,7 @@ const MediaPage = () => {
                   className="w-full h-24 rounded-xl bg-muted px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"
                 />
                 <div className="flex justify-between items-center px-1">
-                  <p className="text-[10px] text-muted-foreground">记录你的感受、进步或今天的小目标</p>
+                  <p className="text-[10px] text-muted-foreground">支持补录历史照片和视频</p>
                   <span className="text-[10px] text-muted-foreground">{composerText.length}/500</span>
                 </div>
               </div>
