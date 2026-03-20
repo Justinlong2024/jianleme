@@ -32,7 +32,10 @@ export const useCheckIn = (userId: string | undefined) => {
   const [loading, setLoading] = useState(true);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitialLoad = useRef(true);
+  const latestCheckInRef = useRef(checkIn);
 
+  // Keep ref in sync
+  useEffect(() => { latestCheckInRef.current = checkIn; }, [checkIn]);
   const today = getLocalDateStr();
 
   // Load today's check-in and history for streak
