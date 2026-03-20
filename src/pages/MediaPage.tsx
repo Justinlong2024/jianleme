@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MediaRecord, VIDEO_TEMPLATES } from '@/types';
 import {
   Camera, Video, Image, Film, Check, X, Play, Clock,
-  Wand2, ChevronRight, Plus, Calendar, Tag, CalendarDays, Loader2,
+  Wand2, ChevronRight, Plus, Calendar, Tag, CalendarDays, Loader2, Download,
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useMediaRecords } from '@/hooks/useMediaRecords';
 import { useAuth } from '@/hooks/useAuth';
+import { generateVideo, downloadVideo } from '@/lib/videoGenerator';
 
 type ViewMode = 'gallery' | 'capture' | 'edit';
 type MediaFilter = 'all' | 'photo' | 'video';
@@ -31,6 +32,8 @@ const MediaPage = () => {
   const [editStep, setEditStep] = useState<'select' | 'template' | 'processing' | 'done'>('select');
   const [selectedTemplate, setSelectedTemplate] = useState<string>('wabisabi');
   const [progress, setProgress] = useState(0);
+  const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+  const videoPreviewRef = useRef<HTMLVideoElement>(null);
   const [previewItem, setPreviewItem] = useState<MediaRecord | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -68,25 +71,44 @@ const MediaPage = () => {
     setEditStep('template');
   };
 
-  const simulateProcessing = () => {
+  const startVideoGeneration = async () => {
     setEditStep('processing');
     setProgress(0);
-    const interval = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 100) {
-          clearInterval(interval);
-          setEditStep('done');
-          return 100;
-        }
-        return p + Math.random() * 8 + 2;
+
+    // Collect image URLs from selected media
+    const selectedMedia = media.filter(m => selectedIds.has(m.id));
+    const imageUrls = selectedMedia
+      .filter(m => m.mediaType === 'photo' && m.url)
+      .map(m => m.url);
+
+    if (imageUrls.length < 2) {
+      toast({ title: '至少需要 2 张照片才能生成视频', variant: 'destructive' });
+      setEditStep('template');
+      return;
+    }
+
+    try {
+      const url = await generateVideo({
+        imageUrls,
+        template: selectedTemplate,
+        onProgress: (pct) => setProgress(pct),
       });
-    }, 200);
+      setGeneratedVideoUrl(url);
+      setEditStep('done');
+    } catch (err) {
+      console.error('Video generation error:', err);
+      toast({ title: '视频生成失败', description: '请检查网络连接后重试', variant: 'destructive' });
+      setEditStep('template');
+    }
   };
 
   const resetEdit = () => {
+    setGeneratedVideoUrl(null);
     setViewMode('gallery');
     setIsSelecting(false);
     setSelectedIds(new Set());
+    setEditStep('select');
+    setProgress(0);
     setEditStep('select');
     setProgress(0);
   };
@@ -335,7 +357,7 @@ const MediaPage = () => {
                 ))}
               </div>
               <button
-                onClick={simulateProcessing}
+                onClick={startVideoGeneration}
                 className="w-full mt-4 h-12 rounded-xl bg-primary text-primary-foreground font-medium hover:opacity-90 transition-all"
               >
                 开始生成
@@ -368,45 +390,44 @@ const MediaPage = () => {
           )}
 
           {/* Done */}
-          {editStep === 'done' && (
+          {editStep === 'done' && generatedVideoUrl && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center py-12"
+              className="flex flex-col items-center py-8"
             >
-              <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mb-5">
-                <Check size={32} className="text-success" />
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Check size={28} className="text-primary" />
               </div>
               <p className="text-lg font-bold text-foreground mb-1">视频生成完成！</p>
-              <p className="text-sm text-muted-foreground mb-6">
-                {selectedIds.size} 张照片/视频已编辑为对比视频
+              <p className="text-sm text-muted-foreground mb-5">
+                {selectedIds.size} 张照片已编辑为对比视频
               </p>
 
-              {/* Mock video preview */}
-              <div className="w-full aspect-[9/16] max-w-[240px] bg-muted rounded-2xl flex items-center justify-center mb-6 relative overflow-hidden">
-                <img
-                  src={`https://picsum.photos/seed/result/240/426`}
-                  alt="生成的视频"
-                  className="w-full h-full object-cover"
+              {/* Real video preview */}
+              <div className="w-full max-w-[280px] rounded-2xl overflow-hidden bg-muted mb-6 shadow-lg">
+                <video
+                  ref={videoPreviewRef}
+                  src={generatedVideoUrl}
+                  className="w-full aspect-[9/16] object-contain bg-black"
+                  controls
+                  playsInline
+                  autoPlay
+                  loop
                 />
-                <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center">
-                  <div className="w-12 h-12 rounded-full bg-card/80 flex items-center justify-center">
-                    <Play size={20} className="text-foreground ml-0.5" />
-                  </div>
-                </div>
-                <div className="absolute bottom-2 left-2 right-2 bg-card/80 backdrop-blur-sm rounded-lg p-2 text-center">
-                  <p className="text-[10px] text-foreground font-medium">我的蜕变之旅</p>
-                  <p className="text-[9px] text-muted-foreground">{selectedIds.size} 天记录 · {VIDEO_TEMPLATES[selectedTemplate]?.label}风格</p>
-                </div>
               </div>
 
               <div className="flex gap-3 w-full">
                 <button
                   onClick={() => {
-                    toast({ title: '已保存到相册 📱' });
+                    if (generatedVideoUrl) {
+                      downloadVideo(generatedVideoUrl, `蜕变视频_${new Date().toISOString().slice(0, 10)}.webm`);
+                      toast({ title: '视频已开始下载 📱' });
+                    }
                   }}
-                  className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium"
+                  className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-medium flex items-center justify-center gap-1.5"
                 >
+                  <Download size={16} />
                   保存视频
                 </button>
                 <button
