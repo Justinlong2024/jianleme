@@ -61,6 +61,7 @@ const HealthInputForm = ({ onSave, isPremium = false }: HealthInputFormProps) =>
       date: selectedDate,
       ...(values.weight ? { weight: parseFloat(values.weight) } : {}),
       ...(values.bodyFat ? { bodyFat: parseFloat(values.bodyFat) } : {}),
+      ...(values.waistCircumference ? { waistCircumference: parseFloat(values.waistCircumference) } : {}),
       ...(values.bloodSugar ? { bloodSugar: parseFloat(values.bloodSugar) } : {}),
       ...(values.bloodPressureSystolic ? { bloodPressureSystolic: parseFloat(values.bloodPressureSystolic) } : {}),
       ...(values.bloodPressureDiastolic ? { bloodPressureDiastolic: parseFloat(values.bloodPressureDiastolic) } : {}),
