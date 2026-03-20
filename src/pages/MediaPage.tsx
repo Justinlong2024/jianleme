@@ -103,9 +103,12 @@ const MediaPage = () => {
   };
 
   const resetEdit = () => {
+    setGeneratedVideoUrl(null);
     setViewMode('gallery');
     setIsSelecting(false);
     setSelectedIds(new Set());
+    setEditStep('select');
+    setProgress(0);
     setEditStep('select');
     setProgress(0);
   };
