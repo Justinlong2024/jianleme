@@ -396,8 +396,8 @@ const MediaPage = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center py-8"
             >
-              <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
-                <Check size={28} className="text-green-600" />
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Check size={28} className="text-primary" />
               </div>
               <p className="text-lg font-bold text-foreground mb-1">视频生成完成！</p>
               <p className="text-sm text-muted-foreground mb-5">
