@@ -143,6 +143,54 @@ export type Database = {
         }
         Relationships: []
       }
+      media_records: {
+        Row: {
+          created_at: string
+          date: string
+          day_number: number | null
+          duration: number | null
+          file_url: string | null
+          id: string
+          media_type: string
+          notes: string | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          updated_at: string
+          user_id: string
+          weight: number | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          day_number?: number | null
+          duration?: number | null
+          file_url?: string | null
+          id?: string
+          media_type?: string
+          notes?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          updated_at?: string
+          user_id: string
+          weight?: number | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          day_number?: number | null
+          duration?: number | null
+          file_url?: string | null
+          id?: string
+          media_type?: string
+          notes?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          updated_at?: string
+          user_id?: string
+          weight?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
