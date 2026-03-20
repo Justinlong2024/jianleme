@@ -76,7 +76,7 @@ const Index = () => {
     return [];
   }, []);
 
-  if (authLoading || subLoading || checkInLoading) {
+  if (authLoading || subLoading || checkInLoading || healthLoading) {
     return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">加载中...</div>;
   }
 
