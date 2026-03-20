@@ -20,6 +20,7 @@ import AuthPage from '@/pages/AuthPage';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useCheckIn } from '@/hooks/useCheckIn';
+import { useHealthRecords } from '@/hooks/useHealthRecords';
 import { HealthRecord } from '@/types';
 import { FoodAnalysisResult } from '@/services/foodAnalysis';
 import { toast } from '@/hooks/use-toast';
